@@ -1,4 +1,4 @@
-# Manpower ERP
+# Workforce Management ERP
 
 A Django-based enterprise resource planning system for manpower operations. It includes company and client management, employee records, project assignments, attendance, timesheets, invoicing, payroll, user accounts, and dashboard reporting.
 
