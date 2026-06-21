@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1">
+
+    <title>Invoice {{ invoice.invoice_no }}</title>
+
+    <style>
+        @page {
+            size: A4 portrait;
+            margin: 7mm;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            color: #000;
+            background: #fff;
+            font-family: "Times New Roman", serif;
+            font-size: 9px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border-spacing: 0;
+        }
+
+        .no-print {
+            padding: 12px;
+            text-align: center;
+            background: #f1f5f9;
+        }
+
+        .no-print button {
+            margin: 0 4px;
+            padding: 8px 18px;
+            border: 1px solid #334155;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+        }
+
+        .print-button {
+            color: #fff;
+            background: #2563eb;
+        }
+
+        .close-button {
+            color: #334155;
+            background: #fff;
+        }
+
+        /*
+         * A4 printable area.
+         * A slightly smaller width prevents the right border being clipped.
+         */
+        .invoice-page {
+            display: flex;
+            flex-direction: column;
+            width: 194mm;
+            min-height: 270mm;
+            margin: 0 auto;
+            padding: 1mm;
+            background: #fff;
+        }
+
+        .invoice-body {
+            width: 100%;
+        }
+
+        /*
+         * Common closed borders
+         */
+        .border-table {
+            width: calc(100% - 1px);
+            border: 1px solid #000;
+            border-collapse: collapse;
+            outline: 1px solid #000;
+            outline-offset: -1px;
+        }
+
+        .border-table th,
+        .border-table td {
+            border: 1px solid #000;
+        }
+
+        .border-table th:last-child,
+        .border-table td:last-child {
+            border-right: 1px solid #000 !important;
+        }
+
+        .border-table tr:last-child th,
+        .border-table tr:last-child td {
+            border-bottom: 1px solid #000 !important;
+        }
+
+        .section-gap {
+            margin-top: 5px;
+        }
+
+        .bold {
+            font-weight: bold;
+        }
+
+        .center {
+            text-align: center;
+        }
+
+        /*
+         * Company heading
+         */
+        .header-table {
+            border: 0;
+        }
+
+        .header-table td {
+            padding: 0;
+            border: 0;
+            vertical-align: middle;
+        }
+
+        .logo-column {
+            width: 20%;
+            text-align: center;
+        }
+
+        .logo {
+            display: block;
+            max-width: 105px;
+            max-height: 68px;
+            margin: 0 auto;
+            object-fit: contain;
+        }
+
+        .company-column {
+            width: 60%;
+            text-align: center;
+        }
+
+        .empty-header-column {
+            width: 20%;
+        }
+
+        .company-arabic {
+            color: #b7d532;
+            font-size: 20px;
+            font-weight: bold;
+            line-height: 1.05;
+        }
+
+        .company-name {
+            color: #303b77;
+            font-size: 26px;
+            font-weight: bold;
+            font-style: italic;
+            line-height: 1.1;
+        }
+
+        .company-line {
+            width: 78%;
+            margin: 2px auto 0;
+            border-bottom: 2px solid #303b77;
+        }
+
+        .invoice-title {
+            margin: 6px 0;
+            font-size: 12px;
+            font-weight: bold;
+            text-align: center;
+            text-decoration: underline;
+        }
+
+        /*
+         * Bill-to and invoice information
+         */
+        .information-table > tbody > tr > td {
+            vertical-align: top;
+        }
+
+        .bill-to {
+            width: 50%;
+            height: 75px;
+            padding: 3px 5px;
+            line-height: 1.25;
+        }
+
+        .invoice-information {
+            width: 50%;
+            padding: 0 !important;
+        }
+
+        .invoice-information table {
+            width: 100%;
+            height: 100%;
+        }
+
+        .invoice-information table td {
+            padding: 2px 4px;
+            border: 0;
+            border-bottom: 1px solid #777;
+        }
+
+        .invoice-information table tr:last-child td {
+            border-bottom: 0;
+        }
+
+        .invoice-label {
+            width: 38%;
+            font-weight: bold;
+        }
+
+        /*
+         * TRN and description
+         */
+        .trn-table td {
+            width: 50%;
+            padding: 3px;
+            text-align: center;
+        }
+
+        .description-table td {
+            padding: 5px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        /*
+         * Invoice items
+         */
+        .items-table {
+            width: calc(100% - 1px);
+            table-layout: fixed;
+        }
+
+        .items-table th {
+            height: 31px;
+            padding: 2px;
+            background: #eee;
+            font-size: 8px;
+            line-height: 1.05;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .items-table td {
+            height: 17px;
+            padding: 1px 3px;
+            font-size: 8px;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .items-table th:nth-child(1) {
+            width: 8%;
+        }
+
+        .items-table th:nth-child(2) {
+            width: 28%;
+        }
+
+        .items-table th:nth-child(3) {
+            width: 8%;
+        }
+
+        .items-table th:nth-child(4) {
+            width: 11%;
+        }
+
+        .items-table th:nth-child(5) {
+            width: 11%;
+        }
+
+        .items-table th:nth-child(6) {
+            width: 13%;
+        }
+
+        .items-table th:nth-child(7) {
+            width: 10%;
+        }
+
+        .items-table th:nth-child(8) {
+            width: 11%;
+        }
+
+        .particular {
+            padding-left: 5px !important;
+            text-align: left !important;
+        }
+
+        .blank-item-row td {
+            height: 17px;
+        }
+
+        .total-row td {
+            height: 20px;
+            font-weight: bold;
+        }
+
+        /*
+         * Amount in words
+         */
+        .amount-words td {
+            padding: 5px;
+            font-size: 9px;
+        }
+
+        /*
+         * Terms and signature section
+         */
+        .document-bottom {
+            margin-top: 6px;
+        }
+
+        .terms-box {
+            min-height: 45px;
+            padding: 4px 5px;
+            line-height: 1.25;
+        }
+
+        .terms-box p {
+            margin: 1px 0;
+        }
+
+        .signature-table {
+            width: calc(100% - 1px);
+            table-layout: fixed;
+        }
+
+        .signature-table th {
+            height: 18px;
+            padding: 2px;
+            font-size: 9px;
+            text-align: center;
+        }
+
+        .signature-table td {
+            height: 66px;
+            padding: 3px;
+            text-align: center;
+            vertical-align: bottom;
+        }
+
+        .signature-space {
+            height: 32px;
+        }
+
+        .signatory-name {
+            font-size: 9px;
+        }
+
+        .signatory-designation {
+            font-size: 8px;
+        }
+
+        .received-by {
+            padding-left: 7px !important;
+            line-height: 1.5;
+            text-align: left !important;
+        }
+
+        /*
+         * Only the company contact information is pushed
+         * to the bottom of the A4 page.
+         */
+        .invoice-footer {
+            width: 100%;
+            margin-top: auto;
+            padding-top: 5px;
+        }
+
+        .contact-footer {
+            padding: 3px 2px;
+            color: #28376e;
+            font-family: Arial, sans-serif;
+            font-size: 8px;
+            font-weight: bold;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .footer-band {
+            display: flex;
+            width: calc(100% - 1px);
+            height: 9px;
+            margin-top: 2px;
+            overflow: hidden;
+        }
+
+        .footer-blue {
+            width: 48%;
+            background: #28376e;
+        }
+
+        .footer-white {
+            width: 4%;
+            transform: skew(-30deg);
+            background: #fff;
+        }
+
+        .footer-green {
+            flex: 1;
+            background: #b7d532;
+        }
+
+        @media screen and (max-width: 850px) {
+            body {
+                overflow-x: auto;
+            }
+
+            .invoice-page {
+                min-width: 760px;
+            }
+        }
+
+        @media print {
+            html,
+            body {
+                width: 100%;
+                height: auto;
+                background: #fff !important;
+                print-color-adjust: exact;
+                -webkit-print-color-adjust: exact;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            .invoice-page {
+                width: 194mm !important;
+                min-height: 270mm !important;
+                margin: 0 auto !important;
+                padding: 1mm !important;
+            }
+
+            .border-table {
+                width: calc(100% - 1px) !important;
+            }
+
+            .invoice-body,
+            .document-bottom,
+            .signature-table,
+            .invoice-footer {
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="no-print">
+    <button type="button"
+            class="print-button"
+            onclick="window.print()">
+        Print / Save as PDF
+    </button>
+
+    <button type="button"
+            class="close-button"
+            onclick="window.close()">
+        Close
+    </button>
+</div>
+
+
+<div class="invoice-page">
+
+    <main class="invoice-body">
+
+        <!-- Company heading -->
+
+        <table class="header-table">
+            <tr>
+                <td class="logo-column">
+                    {% if invoice.company.logo %}
+                        <img src="{{ invoice.company.logo.url }}"
+                             class="logo"
+                             alt="{{ invoice.company.name }}">
+                    {% endif %}
+                </td>
+
+                <td class="company-column">
+                    <div class="company-arabic"
+                         lang="ar"
+                         dir="rtl">
+                        حياة للخدمات البحرية
+                    </div>
+
+                    <div class="company-name">
+                        {{ invoice.company.name }}
+                    </div>
+
+                    <div class="company-line"></div>
+                </td>
+
+                <td class="empty-header-column"></td>
+            </tr>
+        </table>
+
+
+        <div class="invoice-title">
+            TAX INVOICE
+        </div>
+
+
+        <!-- Bill-to and invoice details -->
+
+        <table class="border-table information-table">
+            <tr>
+                <td class="bill-to">
+                    <strong>BILL TO:</strong><br>
+
+                    <strong>
+                        {{ invoice.timesheet.project_site.client.name|upper }}
+                    </strong><br>
+
+                    {% if invoice.timesheet.project_site.client.address %}
+                        {{ invoice.timesheet.project_site.client.address|linebreaksbr }}
+                        <br>
+                    {% endif %}
+
+                    {% if invoice.timesheet.project_site.client.phone %}
+                        Tel:
+                        {{ invoice.timesheet.project_site.client.phone }}
+                        <br>
+                    {% endif %}
+
+                    {% if invoice.timesheet.project_site.client.email %}
+                        Email:
+                        {{ invoice.timesheet.project_site.client.email }}
+                    {% endif %}
+                </td>
+
+                <td class="invoice-information">
+                    <table>
+                        <tr>
+                            <td class="invoice-label">INVOICE NO</td>
+
+                            <td>
+                                {{ invoice.invoice_no }}
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td class="invoice-label">DATE</td>
+
+                            <td>
+                                {{ invoice.invoice_date|date:"d/M/Y" }}
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td class="invoice-label">LPO NO</td>
+
+                            <td>
+                                {{ invoice.lpo_no|default:"-" }}
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td class="invoice-label">SITE</td>
+
+                            <td>
+                                {{ invoice.timesheet.project_site.name|upper }}
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td class="invoice-label">PAYMENT TERMS</td>
+
+                            <td>
+                                {{ invoice.payment_terms|default:"-" }}
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+
+
+        <!-- TRN information -->
+
+        <table class="border-table trn-table section-gap">
+            <tr>
+                <td>
+                    <strong>TRN:</strong>
+                    {{ invoice.timesheet.project_site.client.trn_number|default:"-" }}
+                </td>
+
+                <td>
+                    <strong>TRN:</strong>
+                    {{ invoice.company.trn_number|default:"-" }}
+                </td>
+            </tr>
+        </table>
+
+
+        <!-- Invoice description -->
+
+        <table class="border-table description-table section-gap">
+            <tr>
+                <td>
+                    {% if invoice.description %}
+                        {{ invoice.description }}
+                    {% else %}
+                        Being the charge of contract workers for the month of
+                        {{ invoice.timesheet.month }}/{{ invoice.timesheet.year }}
+                        at
+                        {{ invoice.timesheet.project_site.name|upper }}
+                    {% endif %}
+                </td>
+            </tr>
+        </table>
+
+
+        <!-- Item table -->
+
+        <table class="border-table items-table section-gap">
+            <thead>
+                <tr>
+                    <th>SL NO.</th>
+                    <th>PARTICULAR</th>
+                    <th>QTY</th>
+                    <th>TOTAL<br>HOURS</th>
+                    <th>UNIT<br>PRICE</th>
+                    <th>TAXABLE<br>AMOUNT</th>
+                    <th>5% VAT</th>
+                    <th>NET<br>AMOUNT</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for item in items %}
+                    <tr>
+                        <td>
+                            {{ forloop.counter }}
+                        </td>
+
+                        <td class="particular">
+                            {{ item.designation.name|upper }}
+                        </td>
+
+                        <td>
+                            {{ item.qty }}
+                        </td>
+
+                        <td>
+                            {{ item.total_hours|floatformat:2 }}
+                        </td>
+
+                        <td>
+                            {{ item.unit_price|floatformat:2 }}
+                        </td>
+
+                        <td>
+                            {{ item.taxable_amount|floatformat:2 }}
+                        </td>
+
+                        <td>
+                            {{ item.vat_amount|floatformat:2 }}
+                        </td>
+
+                        <td>
+                            {{ item.net_amount|floatformat:2 }}
+                        </td>
+                    </tr>
+                {% endfor %}
+
+
+                {% for unused in blank_rows %}
+                    <tr class="blank-item-row">
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                    </tr>
+                {% endfor %}
+
+
+                <tr class="total-row">
+                    <td></td>
+
+                    <td>
+                        TOTAL
+                    </td>
+
+                    <td>
+                        {{ total_qty }}
+                    </td>
+
+                    <td>
+                        {{ total_hours|floatformat:2 }}
+                    </td>
+
+                    <td></td>
+
+                    <td>
+                        {{ taxable_total|floatformat:2 }}
+                    </td>
+
+                    <td>
+                        {{ vat_total|floatformat:2 }}
+                    </td>
+
+                    <td>
+                        {{ net_total|floatformat:2 }}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+
+        <!-- Amount in words -->
+
+        <table class="border-table amount-words section-gap">
+            <tr>
+                <td>
+                    <strong>TOTAL (AED)</strong>
+                    {{ amount_words }}
+                </td>
+            </tr>
+        </table>
+
+
+        <!-- Terms and signatures -->
+
+        <section class="document-bottom">
+
+            <table class="border-table">
+                <tr>
+                    <td class="terms-box">
+                        {% if invoice.terms_conditions %}
+                            {{ invoice.terms_conditions|linebreaksbr }}
+                        {% else %}
+                            <p>
+                                1. Please advise us of any discrepancies within
+                                7 days of the date of invoice.
+                            </p>
+
+                            <p>
+                                2. Payment should be in the name of
+                                <strong>
+                                    {{ invoice.company.name|upper }}
+                                </strong>.
+                            </p>
+
+                            <p>
+                                3. Your earliest payment would be highly appreciated.
+                            </p>
+                        {% endif %}
+                    </td>
+                </tr>
+            </table>
+
+
+            <table class="border-table signature-table section-gap">
+                <thead>
+                    <tr>
+                        <th>Checked by</th>
+                        <th>Approved by</th>
+                        <th>Received by</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="signature-space"></div>
+
+                            <div class="signatory-name">
+                                {{ invoice.checked_by|default:"" }}
+                            </div>
+
+                            <div class="signatory-designation">
+                                {{ invoice.checked_by_designation|default:"" }}
+                            </div>
+                        </td>
+
+                        <td>
+                            <div class="signature-space"></div>
+
+                            <div class="signatory-name">
+                                {{ invoice.approved_by|default:"" }}
+                            </div>
+
+                            <div class="signatory-designation">
+                                {{ invoice.approved_by_designation|default:"" }}
+                            </div>
+                        </td>
+
+                        <td class="received-by">
+                            <div class="signature-space"></div>
+
+                            Name &amp; Signature:
+                            ______________________
+                            <br>
+
+                            Date:
+                            ______________________
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </section>
+
+    </main>
+
+
+    <!-- Only the company information stays at the page bottom -->
+
+    <footer class="invoice-footer">
+
+        <div class="contact-footer">
+            {% if invoice.company.phone %}
+                Tel: {{ invoice.company.phone }}
+                &nbsp;&nbsp;&nbsp;
+            {% endif %}
+
+            {% if invoice.company.email %}
+                Email: {{ invoice.company.email }}
+                &nbsp;&nbsp;&nbsp;
+            {% endif %}
+
+            {% if invoice.company.po_box %}
+                P.O. Box: {{ invoice.company.po_box }}
+                &nbsp;&nbsp;&nbsp;
+            {% endif %}
+
+            {% if invoice.company.address %}
+                {{ invoice.company.address|striptags }}
+            {% endif %}
+        </div>
+
+
+        <div class="footer-band">
+            <div class="footer-blue"></div>
+            <div class="footer-white"></div>
+            <div class="footer-green"></div>
+        </div>
+
+    </footer>
+
+</div>
+
+</body>
+</html>

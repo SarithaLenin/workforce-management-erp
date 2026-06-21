@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block page_title %}Record Salary Payment{% endblock %}
+
+{% block page_subtitle %}
+{{ payroll.employee.first_name }}
+{{ payroll.employee.last_name }}
+{% endblock %}
+
+{% block content %}
+
+<div class="border rounded bg-white">
+
+    <div class="p-3 border-bottom">
+        <h5 class="mb-1">
+            {{ payroll.employee.employee_id }} —
+            {{ payroll.employee.first_name }}
+            {{ payroll.employee.last_name }}
+        </h5>
+
+        <div class="text-muted">
+            {{ payroll.get_month_display }}
+            {{ payroll.year }}
+            · Net Salary:
+            <strong>
+                AED {{ payroll.net_salary|floatformat:2 }}
+            </strong>
+        </div>
+    </div>
+
+    <form method="post" class="p-3">
+        {% csrf_token %}
+
+        <div class="row g-3">
+
+            <div class="col-md-6">
+                <label class="form-label">Payment Method</label>
+                {{ form.payment_method }}
+                {{ form.payment_method.errors }}
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Payment Date</label>
+                {{ form.payment_date }}
+                {{ form.payment_date.errors }}
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Reference</label>
+                {{ form.reference }}
+                {{ form.reference.errors }}
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Remarks</label>
+                {{ form.remarks }}
+                {{ form.remarks.errors }}
+            </div>
+
+        </div>
+
+        <div class="mt-3">
+            <button type="submit" class="btn btn-success">
+                Record Payment
+            </button>
+
+            <a href="{% url 'payroll_detail' payroll.pk %}"
+               class="btn btn-outline-secondary">
+                Cancel
+            </a>
+        </div>
+    </form>
+
+</div>
+
+{% endblock %}

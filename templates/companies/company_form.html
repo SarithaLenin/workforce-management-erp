@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block page_title %}
+<h5 class="mb-0">Add Company</h5>
+{% endblock %}
+
+{% block content %}
+
+<div class="card shadow">
+
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">Company Form</h5>
+    </div>
+
+    <div class="card-body">
+
+        <form method="POST" enctype="multipart/form-data">
+
+            {% csrf_token %}
+
+            <div class="row">
+
+                <!-- Name -->
+                <div class="col-md-6 mb-3">
+                    <label>Company Name</label>
+                    {{ form.name }}
+                </div>
+
+                <!-- Code -->
+                <div class="col-md-6 mb-3">
+                    <label>Company Code</label>
+                    {{ form.code }}
+                </div>
+
+                <!-- Trade License -->
+                <div class="col-md-6 mb-3">
+                    <label>Trade License No</label>
+                    {{ form.trade_license_no }}
+                </div>
+
+                <!-- Expiry -->
+                <div class="col-md-6 mb-3">
+                    <label>Trade License Expiry</label>
+                    {{ form.trade_license_expiry }}
+                </div>
+
+                <!-- TRN -->
+                <div class="col-md-6 mb-3">
+                    <label>TRN Number</label>
+                    {{ form.trn_number }}
+                </div>
+
+                <!-- Phone -->
+                <div class="col-md-6 mb-3">
+                    <label>Phone</label>
+                    {{ form.phone }}
+                </div>
+
+                <!-- Email -->
+                <div class="col-md-6 mb-3">
+                    <label>Email</label>
+                    {{ form.email }}
+                </div>
+
+                <!-- PO Box -->
+                <div class="col-md-6 mb-3">
+                    <label>P.O. Box</label>
+                    {{ form.po_box }}
+                </div>
+
+                <!-- Address -->
+                <div class="col-12 mb-3">
+                    <label>Address</label>
+                    {{ form.address }}
+                </div>
+
+                <!-- Logo -->
+                <div class="col-md-6 mb-3">
+                    <label>Logo</label>
+                    {{ form.logo }}
+                    {% if form.instance.logo %}
+                    <br>
+                    <img src="{{ form.instance.logo.url }}"
+                    width="100"
+                    class="mt-2 rounded border">
+                    {% endif %} 
+                </div>
+
+                <!-- Status -->
+                <div class="form-check form-switch mb-3">
+
+                    {{ form.is_active }}
+
+                    <label class="form-check-label">
+                        Active Company
+                    </label>
+
+                </div>
+
+            </div>
+
+            <button type="submit" class="btn btn-success">
+                Save Company
+            </button>
+
+            <a href="{% url 'company_list' %}" class="btn btn-secondary">
+                Cancel
+            </a>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

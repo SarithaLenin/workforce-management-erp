@@ -1,0 +1,211 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+
+{% block page_title %}
+Timesheet Detail
+{% endblock %}
+
+{% block page_subtitle %}
+Saved monthly timesheet
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <div class="card shadow-sm border-0 mb-3">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+
+            <div>
+                <h5 class="mb-1">{{ timesheet.project_site.name }}</h5>
+                <small class="text-muted">
+                    {{ timesheet.project_site.client.name }} |
+                    {{ timesheet.get_month_display }}-{{ timesheet.year }}
+
+                    {% if timesheet.status == 'APPROVED' %}
+                        <span class="badge bg-success ms-2">APPROVED</span>
+                    {% else %}
+                        <span class="badge bg-warning text-dark ms-2">DRAFT</span>
+                    {% endif %}
+                </small>
+            </div>
+
+            <div>
+                <a href="{% url 'timesheet_print' timesheet.id %}"
+                    target="_blank"
+                    class="btn btn-success btn-sm">
+                        Print
+                 </a>
+
+                
+                <a href="{% url 'timesheet_export_excel' timesheet.id %}" class="btn btn-primary btn-sm">
+                    Export Excel
+                </a>
+
+                {% if timesheet.status == 'APPROVED' %}
+                    <a href="{% url 'generate_invoice' timesheet.id %}"
+                    class="btn btn-dark btn-sm">
+                        Generate Invoice
+                    </a>
+                {% endif %}
+
+                
+
+                {% if timesheet.status == 'DRAFT' %}
+
+                    <form method="post"
+                        action="{% url 'timesheet_approve' timesheet.id %}"
+                        class="d-inline">
+                        {% csrf_token %}
+
+                        <button type="submit"
+                                class="btn btn-warning btn-sm"
+                                onclick="return confirm('Approve this timesheet?')">
+                            Approve
+                        </button>
+                    </form>
+
+                    {% else %}
+
+                    {% if request.user.userprofile.role == "admin" %}
+
+                            <form method="post"
+                                action="{% url 'timesheet_reopen' timesheet.id %}"
+                                class="d-inline">
+                                {% csrf_token %}
+
+                                <button type="submit"
+                                        class="btn btn-outline-warning btn-sm">
+                                    Reopen
+                                </button>
+                            </form>
+
+                    {% endif %}
+
+                {% endif %}
+                    
+                {% if timesheet.status == "DRAFT" or request.user.userprofile.role == "admin" %}
+
+                  <a href="{% url 'timesheet_delete' timesheet.id %}"
+                    class="btn btn-danger btn-sm">
+                        Delete
+                  </a>
+
+                {% endif %}
+
+                <a href="{% url 'timesheet_list' %}" class="btn btn-secondary btn-sm">
+                    Back
+                </a>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+
+            <div class="text-center mb-3">
+
+                <h6 class="mb-1">
+                    Details of Manpower Hired from M/s :
+                    <strong>{{ timesheet.company.name }}</strong>
+                </h6>
+
+                <h6 class="mb-1">
+                    Project Name:
+                    <strong>{{ timesheet.project_site.name }}</strong>
+                </h6>
+
+                {% if timesheet.project_site.project_code %}
+                <h6 class="mb-1">
+                    Project Number:
+                    <strong>{{ timesheet.project_site.project_code }}</strong>
+                </h6>
+                {% endif %}
+
+                <h6 class="mb-0 fw-bold">
+                    {{ month_name|upper }}-{{ timesheet.year }}
+                    ({{ start_date|date:"d-m-Y" }} to {{ end_date|date:"d-m-Y" }})
+                </h6>
+
+            </div>
+
+            <div style="overflow-x:auto; width:100%;">
+
+                <table class="table table-bordered table-sm text-center align-middle"
+                       style="min-width:1800px; font-size:12px;">
+
+                    <thead class="table-dark">
+                        <tr>
+                            <th>S.No</th>
+                            <th style="min-width:220px;">Name</th>
+                            <th style="min-width:120px;">Designation</th>
+
+                            {% for day in days %}
+                                <th>{{ day }}</th>
+                            {% endfor %}
+
+                            <th style="min-width:90px;">Total Hours</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for row in rows %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+
+                            <td class="text-start">
+                                {{ row.employee_name }}
+                            </td>
+
+                            <td>
+                                {{ row.designation }}
+                            </td>
+
+                            {% for value in row.days %}
+                                <td>{{ value }}</td>
+                            {% endfor %}
+
+                            <td>
+                                <strong>{{ row.total_hours }}</strong>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="36" class="text-center text-muted py-4">
+                                No saved timesheet rows found.
+                            </td>
+                        </tr>
+                        {% endfor %}
+
+                        {% if rows %}
+                        <tr class="fw-bold table-secondary">
+                            <td colspan="3">
+                                Daily Total Hours
+                            </td>
+
+                            {% for day in days %}
+                                <td>
+                                    {{ daily_totals|get_item:day|default:"0" }}
+                                </td>
+                            {% endfor %}
+
+                            <td>
+                                {{ grand_total_hours }}
+                            </td>
+                        </tr>
+                        {% endif %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

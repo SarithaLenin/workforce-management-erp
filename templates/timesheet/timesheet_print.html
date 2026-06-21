@@ -1,0 +1,188 @@
+{% load custom_filters %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <title>
+        Timesheet -
+        {{ timesheet.get_month_display }}
+        {{ timesheet.year }}
+    </title>
+
+    <style>
+        @page {
+            size: A4 landscape;
+            margin: 6mm;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            color: #111;
+        }
+
+        .heading {
+            margin-bottom: 6px;
+            text-align: center;
+        }
+
+        .heading h3,
+        .heading p {
+            margin: 2px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+            font-size: 6.5px;
+        }
+
+        th,
+        td {
+            padding: 2px 1px;
+            border: 1px solid #333;
+            text-align: center;
+            line-height: 1.1;
+            word-break: break-word;
+        }
+
+        th {
+            background: #263447;
+            color: white;
+        }
+
+        th:first-child {
+            width: 3%;
+        }
+
+        th:nth-child(2) {
+            width: 14%;
+        }
+
+        th:nth-child(3) {
+            width: 8%;
+        }
+
+        th:last-child {
+            width: 6%;
+        }
+
+        .name {
+            text-align: left;
+        }
+
+        .total-row {
+            background: #e5e7eb;
+            font-weight: bold;
+        }
+
+        .print-actions {
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        @media print {
+            .print-actions {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="print-actions">
+    <button onclick="window.print()">
+        Print
+    </button>
+
+    <button onclick="window.close()">
+        Close
+    </button>
+</div>
+
+<div class="heading">
+    <h3>
+        Details of Manpower Hired from M/s:
+        {{ timesheet.company.name }}
+    </h3>
+
+    <p>
+        <strong>Project:</strong>
+        {{ timesheet.project_site.name }}
+
+        {% if timesheet.project_site.project_code %}
+            |
+            <strong>Project Number:</strong>
+            {{ timesheet.project_site.project_code }}
+        {% endif %}
+    </p>
+
+    <p>
+        <strong>
+            {{ month_name|upper }}-{{ timesheet.year }}
+            ({{ start_date|date:"d-m-Y" }}
+            to {{ end_date|date:"d-m-Y" }})
+        </strong>
+    </p>
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>S.No</th>
+            <th>Name</th>
+            <th>Designation</th>
+
+            {% for day in days %}
+                <th>{{ day }}</th>
+            {% endfor %}
+
+            <th>Total</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for row in rows %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+
+                <td class="name">
+                    {{ row.employee_name }}
+                </td>
+
+                <td>{{ row.designation }}</td>
+
+                {% for value in row.days %}
+                    <td>{{ value }}</td>
+                {% endfor %}
+
+                <td>
+                    <strong>{{ row.total_hours }}</strong>
+                </td>
+            </tr>
+        {% endfor %}
+
+        {% if rows %}
+            <tr class="total-row">
+                <td colspan="3">
+                    Daily Total Hours
+                </td>
+
+                {% for day in days %}
+                    <td>
+                        {{ daily_totals|get_item:day|default:"0" }}
+                    </td>
+                {% endfor %}
+
+                <td>{{ grand_total_hours }}</td>
+            </tr>
+        {% endif %}
+    </tbody>
+</table>
+
+</body>
+</html>

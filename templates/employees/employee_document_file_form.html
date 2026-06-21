@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Document File{% endblock %}
+{% block page_title %}Add Document File{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <div class="card shadow-sm border-0">
+
+        <div class="card-header bg-white">
+            <h5 class="mb-0">
+                Add File to {{ document.get_document_type_display }}
+            </h5>
+        </div>
+
+        <div class="card-body">
+
+            <p>
+                Employee:
+                <strong>
+                    {{ employee.first_name }} {{ employee.last_name }}
+                </strong>
+            </p>
+
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="mb-3">
+                    <label>Upload Files</label>
+
+                    <input type="file"
+                           name="files"
+                           multiple
+                           class="form-control">
+
+                    <small class="text-muted">
+                        You can select passport front and back together.
+                    </small>
+                </div>
+
+                <button type="submit" class="btn btn-success">
+                    Save Files
+                </button>
+
+                <a href="{% url 'employee_detail' employee.id %}" class="btn btn-secondary">
+                    Cancel
+                </a>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

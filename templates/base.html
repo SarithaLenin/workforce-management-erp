@@ -1,0 +1,341 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>
+        {% block title %}Manpower ERP{% endblock %}
+    </title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+</head>
+
+<body>
+
+<div class="wrapper">
+
+    <!-- SIDEBAR -->
+   <div class="sidebar" id="mobileSidebar">
+
+        <div class="text-center mb-4">
+            <div class="logo-circle">
+                <i class="bi bi-people-fill"></i>
+            </div>
+            <h5 class="mt-2 mb-0">HAYAAT GROUP</h5>
+            <small>Workforce Management System</small>
+        </div>
+        
+    {% with role=request.user.userprofile.role %}
+
+        <a href="{% url 'dashboard' %}" class="menu-link">
+            <i class="bi bi-speedometer2"></i> Dashboard
+        </a>
+
+        
+
+           {% with current_url=request.resolver_match.url_name %}
+
+                <a class="menu-link" data-bs-toggle="collapse" href="#masterDataMenu">
+                    <i class="bi bi-folder"></i> Master Data
+                    <i class="bi bi-chevron-down float-end"></i>
+                </a>
+
+                <div class="collapse submenu
+                    {% if current_url == 'company_list' or current_url == 'employee_list' or current_url == 'client_list' or current_url == 'project_site_list' or current_url == 'billing_rate_list' %}
+                    show
+                    {% endif %}"
+                    id="masterDataMenu">
+                {% if role == 'admin' %}
+
+                    <a href="{% url 'company_list' %}" class="{% if current_url == 'company_list' %}active{% endif %}">
+                        Companies
+                    </a>
+                 {% endif %} 
+
+                 
+
+                    <a href="{% url 'employee_list' %}" class="{% if current_url == 'employee_list' %}active{% endif %}">
+                        Employees
+                    </a>
+                 
+
+                  
+
+                    <a href="{% url 'client_list' %}" class="{% if current_url == 'client_list' %}active{% endif %}">
+                        Clients
+                    </a>
+
+                    <a href="{% url 'project_site_list' %}" class="{% if current_url == 'project_site_list' %}active{% endif %}">
+                        Projects / Sites
+                    </a>
+
+                    <a href="{% url 'billing_rate_list' %}" class="{% if current_url == 'billing_rate_list' %}active{% endif %}">
+                        Billing Rates
+                    </a>
+                
+
+                </div>
+
+
+            {% endwith %}
+       
+
+        {% with current_url=request.resolver_match.url_name %}
+
+            <a class="menu-link" data-bs-toggle="collapse" href="#operationsMenu">
+                <i class="bi bi-briefcase"></i> Operations
+                <i class="bi bi-chevron-down float-end"></i>
+            </a>
+
+            <div class="collapse submenu
+            {% if current_url == 'assignment_list' or current_url == 'attendance_entry' or current_url == 'attendance_list' or current_url == 'timesheet_generate' or current_url == 'timesheet_list' %}
+            show
+            {% endif %}"
+            id="operationsMenu">
+
+                <a href="{% url 'assignment_list' %}" class="{% if current_url == 'assignment_list' %}active{% endif %}">Assignments</a>
+                <a href="{% url 'attendance_entry' %}" class="{% if current_url == 'attendance_entry' %}active{% endif %}">Attendance</a>
+                <a href="{% url 'attendance_list' %}" class="{% if current_url == 'attendance_list' %}active{% endif %}">Attendance List</a>
+                <a href="{% url 'timesheet_generate' %}" class="{% if current_url == 'timesheet_generate' %}active{% endif %}">Timesheet</a>
+                <a href="{% url 'timesheet_list' %}" class="{% if current_url == 'timesheet_list' %}active{% endif %}">Timesheet List</a>
+
+            </div>
+        {% endwith %}
+
+         
+
+        {% with current_url=request.resolver_match.url_name %}
+
+            <a class="menu-link" data-bs-toggle="collapse" href="#invoiceMenu">
+                <i class="bi bi-receipt"></i> Invoice Management
+                <i class="bi bi-chevron-down float-end"></i>
+            </a>
+
+            <div class="collapse submenu
+                {% if current_url == 'invoice_list' or current_url == 'invoice_detail' or current_url == 'invoice_edit' or current_url == 'invoice_delete' or current_url == 'outstanding_invoice_report' or current_url == 'payment_collection_report'%}
+                show
+                {% endif %}"
+                id="invoiceMenu">
+
+                    <a href="{% url 'invoice_list' %}" class="{% if current_url == 'invoice_list' %}active{% endif %}">Invoice List</a>
+                    <a href="{% url 'outstanding_invoice_report' %}" class="{% if current_url == 'outstanding_invoice_report' %}active{% endif %}">Outstanding Invoices</a>
+                    <a href="{% url 'payment_collection_report' %}" class="{% if current_url == 'payment_collection_report' %}active{% endif %}">Payment Collection</a>
+            
+            </div>
+        
+        {% endwith %}
+
+
+
+        {% with current_url=request.resolver_match.url_name %}
+
+            <a
+                class="menu-link {% if 'payroll' in current_url %}active-parent{% endif %}"
+                data-bs-toggle="collapse"
+                href="#payrollMenu"
+                aria-expanded="{% if 'payroll' in current_url %}true{% else %}false{% endif %}"
+            >
+                <i class="bi bi-cash-stack"></i>
+                Payroll
+                <i class="bi bi-chevron-down float-end menu-chevron"></i>
+            </a>
+
+            <div
+                id="payrollMenu"
+                class="collapse submenu {% if 'payroll' in current_url %}show{% endif %}"
+            >
+
+                {% if role == "admin" or role == "accountant" %}
+                    <a
+                        href="{% url 'generate_payroll' %}"
+                        class="{% if current_url == 'generate_payroll' %}active{% endif %}"
+                    >
+                        <i class="bi bi-calculator me-2"></i>
+                        Generate Payroll
+                    </a>
+                {% endif %}
+
+                <a
+                    href="{% url 'payroll_list' %}"
+                    class="{% if current_url == 'payroll_list' or current_url == 'payroll_detail' or current_url == 'payroll_edit' or current_url == 'payroll_deduction_edit' or current_url == 'payroll_reopen' %}active{% endif %}"
+                >
+                    <i class="bi bi-list-check me-2"></i>
+                    Payroll Records
+                </a>
+
+                {% if role == "admin" or role == "accountant" %}
+                    <a
+                        href="{% url 'payroll_payment_process' %}"
+                        class="{% if current_url == 'payroll_payment_process' %}active{% endif %}"
+                    >
+                        <i class="bi bi-credit-card me-2"></i>
+                        Process Payments
+                    </a>
+                {% endif %}
+
+            </div>
+
+        {% endwith %}
+        <!-- <a class="menu-link" data-bs-toggle="collapse" href="#reportsMenu">
+            <i class="bi bi-bar-chart"></i> Reports
+            <i class="bi bi-chevron-down float-end"></i>
+        </a> -->
+
+     {% with current_url=request.resolver_match.url_name %}  
+
+        <a class="menu-link" data-bs-toggle="collapse" href="#accountMenu">
+            <i class="bi bi-person-circle"></i> Account
+            <i class="bi bi-chevron-down float-end"></i>
+        </a>
+
+        <div class="collapse submenu
+        {% if current_url == 'logout' %}
+        show
+        {% endif %}"
+        id="accountMenu">
+
+          {% if role == 'admin' %}
+
+            <a href="{% url 'user_list' %}">User Management</a>
+          {% endif %}
+
+            <a href="{% url 'profile'%}">Profile</a>
+            <a href="{% url 'settings'%}">Settings</a>
+            <a href="{% url 'logout' %}" class="{% if current_url == 'logout' %}active{% endif %}">Logout</a>
+
+        </div>
+     {% endwith %}
+    {% endwith %}
+
+
+         <div class="sidebar-user mt-5 p-3 border-top">
+
+            <div class="d-flex align-items-center">
+
+                <div class="user-avatar">
+                    <i class="bi bi-person-circle fs-1 text-light"></i>
+                </div>
+
+                <div class="ms-2">
+
+                    <div class="fw-bold text-white">
+                        {{ request.user.get_full_name|default:request.user.username }}
+                    </div>
+
+                    <small class="text-light">
+
+                        {% if request.user.userprofile.role == 'admin' %}
+                            Administrator
+
+                        {% elif request.user.userprofile.role == 'accountant' %}
+                            Accountant
+
+                        {% elif request.user.userprofile.role == 'hr' %}
+                            HR Staff
+
+                        {% endif %}
+
+                    </small>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+    <!-- MAIN AREA -->
+    <div class="main-content">
+
+        <!-- TOP BAR -->
+        <nav class="navbar navbar-light bg-white shadow-sm rounded mb-4">
+
+    <div class="container-fluid d-flex justify-content-between align-items-center">
+
+        <div>
+
+            <h5 class="mb-0">
+                {% block page_title %}
+                    Dashboard
+                {% endblock %}
+            </h5>
+
+            <small class="text-muted">
+                {% block page_subtitle %}
+                {% endblock %}
+            </small>
+
+        </div>
+
+        <div>
+            {% block page_actions %}
+            {% endblock %}
+        </div>
+
+    </div>
+
+</nav>
+
+        <!-- PAGE CONTENT -->
+        <div class="container">
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            {% block content %}
+            {% endblock %}
+
+        </div>
+
+    </div>
+
+</div>
+
+   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+
+   <script>
+    function toggleMobileSidebar() {
+        document
+            .getElementById("mobileSidebar")
+            .classList.toggle("mobile-open");
+
+        document
+            .getElementById("sidebarOverlay")
+            .classList.toggle("mobile-open");
+    }
+</script>
+
+</body>
+
+
+<button
+    type="button"
+    class="mobile-menu-button"
+    onclick="toggleMobileSidebar()"
+>
+    <i class="bi bi-list"></i>
+</button>
+
+<div
+    id="sidebarOverlay"
+    class="sidebar-overlay"
+    onclick="toggleMobileSidebar()"
+></div>
+</html>

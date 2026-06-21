@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block page_title %}
+    {% if form.instance.pk %}
+        Edit Project / Site
+    {% else %}
+        Add Project / Site
+    {% endif %}
+{% endblock %}
+
+{% block page_subtitle %}
+Manage project/site details and LPO information
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Project / Site Information</h5>
+            </div>
+
+            <div class="card-body">
+                <div class="row">
+
+                    <div class="col-md-4 mb-3">
+                        <label>Client Company</label>
+                        {{ form.client }}
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label>Project Code</label>
+                        {{ form.project_code }}
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label>Project / Site Name</label>
+                        {{ form.name }}
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label>LPO Number</label>
+                        {{ form.lpo_number }}
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label>Location</label>
+                        {{ form.location }}
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label>Start Date</label>
+                        {{ form.start_date }}
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label>End Date</label>
+                        {{ form.end_date }}
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label>LPO Document</label>
+                        {{ form.lpo_file }}
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label>Quotation Document</label>
+                        {{ form.quotation_file }}
+                    </div>
+
+                    <div class="col-md-12 mb-3">
+                        <label>Remarks</label>
+                        {{ form.remarks }}
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Status</h5>
+            </div>
+
+            <div class="card-body">
+                <div class="form-check form-switch">
+                    {{ form.is_active }}
+                    <label class="form-check-label">Active Project / Site</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-4">
+            <button type="submit" class="btn btn-success">
+                <i class="bi bi-check-circle"></i> Save Project / Site
+            </button>
+
+            <a href="{% url 'project_site_list' %}" class="btn btn-secondary">
+                Cancel
+            </a>
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

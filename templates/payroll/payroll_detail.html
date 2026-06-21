@@ -1,0 +1,445 @@
+{% extends "base.html" %}
+
+{% block page_title %}Payroll Details{% endblock %}
+
+{% block page_subtitle %}
+{{ payroll.employee.first_name }}
+{{ payroll.employee.last_name }}
+— {{ payroll.get_month_display }} {{ payroll.year }}
+{% endblock %}
+
+
+
+{% block page_actions %}
+
+    <a href="{% url 'payroll_list' %}"
+    class="btn btn-outline-secondary btn-sm">
+        Back
+    </a>
+
+    {% if payroll.status != "DRAFT" %}
+        <a href="{% url 'salary_slip' payroll.pk %}"
+        target="_blank"
+        class="btn btn-outline-primary btn-sm">
+            Salary Slip
+        </a>
+    {% endif %}
+
+    {% if payroll.status == "DRAFT" %}
+
+        {% if payroll.salary_type == "BASIC" %}
+            <a href="{% url 'payroll_edit' payroll.pk %}"
+            class="btn btn-primary btn-sm">
+                Edit Payroll
+            </a>
+        {% endif %}
+
+        <form method="post"
+            action="{% url 'payroll_recalculate' payroll.pk %}"
+            class="d-inline">
+            {% csrf_token %}
+            <button class="btn btn-outline-primary btn-sm">
+                Recalculate/Refresh 
+            </button>
+        </form>
+
+        <form method="post"
+            action="{% url 'payroll_approve' payroll.pk %}"
+            class="d-inline">
+            {% csrf_token %}
+            <button class="btn btn-success btn-sm"
+                    onclick="return confirm('Approve and lock this payroll?')">
+                Approve
+            </button>
+        </form>
+
+        <form method="post"
+            action="{% url 'payroll_delete' payroll.pk %}"
+            class="d-inline">
+            {% csrf_token %}
+            <button class="btn btn-outline-danger btn-sm"
+                    onclick="return confirm('Delete this draft payroll?')">
+                Delete
+            </button>
+        </form>
+
+    {% elif payroll.status == "APPROVED" %}
+
+        <form method="post"
+            action="{% url 'payroll_mark_paid' payroll.pk %}"
+            class="d-inline">
+            {% csrf_token %}
+             <a href="{% url 'payroll_reopen' payroll.pk %}"class="btn btn-warning btn-sm">
+                Reopen
+            </a>
+
+
+           <a href="{% url 'payroll_record_payment' payroll.pk %}"class="btn btn-success btn-sm">
+                Record Payment
+            </a>
+
+        </form>
+
+    {% endif %}
+
+{% endblock %}
+
+
+
+
+{% block content %}
+
+<div class="border rounded bg-white mb-3">
+
+    <div class="p-3 border-bottom d-flex
+                justify-content-between align-items-center">
+
+        <div>
+            <h5 class="mb-1">
+                {{ payroll.employee.employee_id }} —
+                {{ payroll.employee.first_name }}
+                {{ payroll.employee.last_name }}
+            </h5>
+
+            <div class="text-muted small">
+                {{ payroll.company.name }} ·
+                {{ payroll.get_salary_type_display }}
+            </div>
+        </div>
+
+        <div>
+            {% if payroll.status == "PAID" %}
+                <span class="badge bg-success">Paid</span>
+            {% elif payroll.status == "APPROVED" %}
+                <span class="badge bg-primary">Approved</span>
+            {% else %}
+                <span class="badge bg-warning text-dark">Draft</span>
+            {% endif %}
+        </div>
+
+    </div>
+
+
+    <div class="table-responsive">
+        <table class="table mb-0">
+            <tbody>
+
+                {% if payroll.salary_type == "BASIC" %}
+
+                    <tr>
+                        <th>Basic Salary</th>
+                        <td class="text-end">
+                            AED {{ payroll.basic_salary|floatformat:2 }}
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th>Food Allowance</th>
+                        <td class="text-end">
+                            AED {{ payroll.food_allowance|floatformat:2 }}
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th>
+                            Overtime
+                            <small class="text-muted">
+                                ({{ payroll.overtime_hours|floatformat:2 }}
+                                hours × AED
+                                {{ payroll.overtime_rate|floatformat:2 }})
+                            </small>
+                        </th>
+                        <td class="text-end text-success">
+                            + AED {{ payroll.overtime_amount|floatformat:2 }}
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th>
+                            Absence
+                            <small class="text-muted">
+                                ({{ payroll.absent_days }} days × AED
+                                {{ payroll.absent_rate|floatformat:2 }})
+                            </small>
+                        </th>
+                        <td class="text-end text-danger">
+                            − AED {{ payroll.absence_deduction|floatformat:2 }}
+                        </td>
+                    </tr>
+
+                {% else %}
+
+                    <tr>
+                        <th>Total Approved Hours</th>
+                        <td class="text-end">
+                            {{ payroll.total_hours|floatformat:2 }}
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th>Hourly Rate</th>
+                        <td class="text-end">
+                            AED {{ payroll.hourly_rate|floatformat:2 }}
+                        </td>
+                    </tr>
+
+                {% endif %}
+
+                <tr class="table-light">
+                    <th>Gross Salary</th>
+                    <td class="text-end fw-bold">
+                        AED {{ payroll.gross_salary|floatformat:2 }}
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+
+{% if payroll.status == "PAID" %}
+
+    <div class="border rounded bg-white mb-3">
+
+        <div class="p-3 border-bottom d-flex
+                    justify-content-between align-items-center">
+
+            <h5 class="mb-0">Payment Information</h5>
+
+            <span class="badge bg-success">Paid</span>
+        </div>
+
+        {% if payment_item %}
+
+            <div class="table-responsive">
+                <table class="table mb-0">
+                    <tbody>
+
+                        <tr>
+                            <th>Payment Batch</th>
+                            <td>
+                                PAY-{{ payment_item.batch.id }}
+                            </td>
+
+                            <th>Payment Method</th>
+                            <td>
+                                {{ payment_item.batch.get_payment_method_display }}
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th>Payment Date</th>
+                            <td>
+                                {{ payment_item.batch.payment_date|date:"d M Y" }}
+                            </td>
+
+                            <th>Paid Amount</th>
+                            <td>
+                                AED {{ payment_item.paid_amount|floatformat:2 }}
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th>Reference</th>
+                            <td>
+                                {{ payment_item.batch.reference|default:"—" }}
+                            </td>
+
+                            <th>Processed By</th>
+                            <td>
+                                {{ payment_item.batch.processed_by.get_full_name|default:payment_item.batch.processed_by.username }}
+                            </td>
+                        </tr>
+
+                        {% if payment_item.batch.remarks %}
+                            <tr>
+                                <th>Remarks</th>
+                                <td colspan="3">
+                                    {{ payment_item.batch.remarks }}
+                                </td>
+                            </tr>
+                        {% endif %}
+
+                    </tbody>
+                </table>
+            </div>
+
+        {% else %}
+
+            <div class="p-3 text-muted">
+                This payroll was marked paid before payment-batch
+                tracking was introduced.
+            </div>
+
+        {% endif %}
+
+    </div>
+
+{% endif %}
+
+
+<div class="border rounded bg-white mb-3">
+
+    <div class="p-3 border-bottom">
+        <h5 class="mb-0">Variable Deductions</h5>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+
+            <thead class="table-light">
+                <tr>
+                    <th>Type</th>
+                    <th>Remarks</th>
+                    <th>Date</th>
+                    <th class="text-end">Amount</th>
+                    {% if payroll.status == "DRAFT" %}
+                        <th class="text-end">Action</th>
+                    {% endif %}
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for deduction in payroll.deductions.all %}
+                    <tr>
+                        <td>
+                            {{ deduction.get_deduction_type_display }}
+                        </td>
+
+                        <td>
+                            {{ deduction.remarks|default:"—" }}
+                        </td>
+
+                        <td>
+                            {{ deduction.created_at|date:"d M Y" }}
+                        </td>
+
+                        <td class="text-end text-danger">
+                            AED {{ deduction.amount|floatformat:2 }}
+                        </td>
+
+                        {% if payroll.status == "DRAFT" %}
+                            <td class="text-end">
+                                <form
+                                    method="post"
+                                    action="{% url 'payroll_deduction_delete' deduction.pk %}"
+                                    class="d-inline"
+                                >
+                                    {% csrf_token %}
+
+                                    <a href="{% url 'payroll_deduction_edit' deduction.pk %}" class="btn btn-sm btn-outline-primary">
+                                            Edit
+                                    </a>
+
+                                    <button
+                                        type="submit"
+                                        class="btn btn-sm btn-outline-danger"
+                                        onclick="return confirm('Delete this deduction?')"
+                                    >
+                                        Delete
+                                    </button>
+                                </form>
+                            </td>
+                        {% endif %}
+                    </tr>
+
+                {% empty %}
+                    <tr>
+                        <td
+                            colspan="5"
+                            class="text-center text-muted py-3"
+                        >
+                            No variable deductions entered.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+    </div>
+
+
+    {% if payroll.status == "DRAFT" %}
+        <div class="p-3 border-top">
+
+            <form
+                method="post"
+                action="{% url 'payroll_deduction_add' payroll.pk %}"
+                class="row g-3 align-items-end"
+            >
+                {% csrf_token %}
+
+                <div class="col-md-3">
+                    <label class="form-label">Deduction Type</label>
+                    {{ deduction_form.deduction_type }}
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Amount</label>
+                    {{ deduction_form.amount }}
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Remarks</label>
+                    {{ deduction_form.remarks }}
+                </div>
+
+                <div class="col-md-2">
+                    <button
+                        type="submit"
+                        class="btn btn-danger w-100"
+                    >
+                        Add Deduction
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    {% endif %}
+
+</div>
+
+
+<div class="border rounded bg-white">
+    <div class="table-responsive">
+
+        <table class="table mb-0">
+            <tbody>
+
+                <tr>
+                    <th>Gross Salary</th>
+                    <td class="text-end">
+                        AED {{ payroll.gross_salary|floatformat:2 }}
+                    </td>
+                </tr>
+
+                <tr>
+                    <th>Absence Deduction</th>
+                    <td class="text-end text-danger">
+                        − AED {{ payroll.absence_deduction|floatformat:2 }}
+                    </td>
+                </tr>
+
+                <tr>
+                    <th>Advance, Visa and Other Deductions</th>
+                    <td class="text-end text-danger">
+                        − AED {{ payroll.other_deductions|floatformat:2 }}
+                    </td>
+                </tr>
+
+                <tr class="table-dark">
+                    <th class="fs-5">Net Salary</th>
+                    <td class="text-end fs-5 fw-bold">
+                        AED {{ payroll.net_salary|floatformat:2 }}
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+
+    </div>
+</div>
+
+{% endblock %}

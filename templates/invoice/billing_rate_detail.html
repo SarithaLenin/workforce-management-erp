@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block page_title %}
+Billing Rate Detail
+{% endblock %}
+
+{% block page_subtitle %}
+View project billing rate
+{% endblock %}
+
+{% block content %}
+
+<div class="card shadow-sm border-0">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">{{ rate.project_site.name }}</h5>
+
+        <div>
+            <a href="{% url 'billing_rate_edit' rate.id %}" class="btn btn-warning btn-sm">Edit</a>
+            <a href="{% url 'billing_rate_delete' rate.id %}" class="btn btn-danger btn-sm"> Delete </a>
+            <a href="{% url 'billing_rate_list' %}" class="btn btn-secondary btn-sm">Back</a>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <table class="table table-bordered">
+            <tr>
+                <th style="width:250px;">Client</th>
+                <td>{{ rate.project_site.client.name }}</td>
+            </tr>
+            <tr>
+                <th>Project / Site</th>
+                <td>{{ rate.project_site.name }}</td>
+            </tr>
+            <tr>
+                <th>Billing Designation</th>
+                <td>{{ rate.billing_designation.name }}</td>
+            </tr>
+            <tr>
+                <th>Hourly Rate</th>
+                <td>{{ rate.hourly_rate }}</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

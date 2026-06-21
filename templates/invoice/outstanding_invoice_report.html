@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+
+{% block page_title %}
+Outstanding Invoice Report
+{% endblock %}
+
+{% block page_subtitle %}
+Approved invoices not yet paid
+{% endblock %}
+
+{% block content %}
+
+<div class="row mb-3">
+
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h6>Outstanding Invoices</h6>
+                <h3>{{ outstanding_count }}</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h6>Outstanding Amount</h6>
+                <h3 class="text-danger">AED {{ total_outstanding }}</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h6>Average Days Outstanding</h6>
+                <h3>{{ average_days }} Days</h3>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="card shadow-sm border-0 mb-3">
+    <div class="card-body">
+
+        <form method="GET" class="row g-2">
+
+            <div class="col-md-4">
+                <input type="text"
+                       name="search"
+                       class="form-control"
+                       placeholder="Search client, project or invoice no..."
+                       value="{{ search }}">
+            </div>
+
+            <div class="col-md-2">
+                <select name="month" class="form-select">
+                    <option value="">All Months</option>
+                    <option value="1" {% if month == '1' %}selected{% endif %}>January</option>
+                    <option value="2" {% if month == '2' %}selected{% endif %}>February</option>
+                    <option value="3" {% if month == '3' %}selected{% endif %}>March</option>
+                    <option value="4" {% if month == '4' %}selected{% endif %}>April</option>
+                    <option value="5" {% if month == '5' %}selected{% endif %}>May</option>
+                    <option value="6" {% if month == '6' %}selected{% endif %}>June</option>
+                    <option value="7" {% if month == '7' %}selected{% endif %}>July</option>
+                    <option value="8" {% if month == '8' %}selected{% endif %}>August</option>
+                    <option value="9" {% if month == '9' %}selected{% endif %}>September</option>
+                    <option value="10" {% if month == '10' %}selected{% endif %}>October</option>
+                    <option value="11" {% if month == '11' %}selected{% endif %}>November</option>
+                    <option value="12" {% if month == '12' %}selected{% endif %}>December</option>
+                </select>
+            </div>
+
+            <div class="col-md-2">
+                <input type="number"
+                       name="year"
+                       class="form-control"
+                       placeholder="Year"
+                       value="{{ year }}">
+            </div>
+
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-dark w-100">
+                    Search
+                </button>
+            </div>
+
+            <div class="col-md-2">
+                <a href="{% url 'outstanding_invoice_report' %}"
+                   class="btn btn-secondary w-100">
+                    Reset
+                </a>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+<div class="card shadow-sm border-0">
+
+    <div class="card-header bg-white">
+        <h5 class="mb-0">Outstanding Invoices</h5>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+
+            <thead class="table-dark">
+                <tr>
+                    <th>Invoice No</th>
+                    <th>Date</th>
+                    <th>Client</th>
+                    <th>Project</th>
+                    <th>Status</th>
+                    <th>LPO No</th>
+                    <th>Amount</th>
+                    <th>Days Outstanding</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for row in report_data %}
+                <tr style="cursor:pointer;"onclick="window.location.href='{% url 'invoice_detail' row.invoice.id %}'">
+
+                    <td>{{ row.invoice.invoice_no }}</td>
+                    <td>{{ row.invoice.invoice_date|date:"d-m-Y" }}</td>
+                    <td>{{ row.invoice.timesheet.project_site.client.name }}</td>
+                    <td>{{ row.invoice.timesheet.project_site.name }}</td>
+
+                    <td>
+                        {% if row.invoice.status == 'APPROVED' %}
+                            <span class="badge bg-warning text-dark">
+                                APPROVED
+                            </span>
+
+                        {% elif row.invoice.status == 'PAID' %}
+                            <span class="badge bg-success">
+                                PAID
+                            </span>
+
+                        {% else %}
+                            <span class="badge bg-secondary">
+                                DRAFT
+                            </span>
+                        {% endif %}
+                    </td>
+
+                    <td>{{ row.invoice.lpo_no|default:"-" }}</td>
+                    <td>AED {{ row.net_total }}</td>
+                    <td>{{ row.days_outstanding }} Days</td>
+
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" class="text-center text-muted py-4">
+                        No outstanding invoices.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+    </div>
+
+</div>
+
+{% endblock %}

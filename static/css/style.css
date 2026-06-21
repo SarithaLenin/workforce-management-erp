@@ -1,0 +1,373 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    background:#f1f5f9;
+    font-family:Segoe UI,sans-serif;
+}
+
+.wrapper{
+    display:flex;
+}
+
+.sidebar{
+    width:260px;
+    min-height:100vh;
+    background:#1e293b;
+    color:white;
+    padding:20px 15px;
+}
+
+.sidebar {
+    display: flex;
+    flex-direction: column;
+  
+    
+}
+
+.sidebar-user {
+    margin-top: 15px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 10px;
+    padding: 12px;
+}
+
+.sidebar-user small {
+    display: block;
+}
+
+/* Logo Section */
+
+.logo-circle{
+    width:60px;
+    height:60px;
+    border-radius:50%;
+    background:white;
+    color:#1e293b;
+    margin:0 auto;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:24px;
+    font-weight:bold;
+}
+
+.sidebar h5{
+    color:white;
+    margin-top:10px;
+    margin-bottom:0;
+}
+
+.sidebar small{
+    color:#cbd5e1;
+}
+
+/* Section Heading */
+
+.sidebar-heading{
+    color:#94a3b8;
+    font-size:11px;
+    font-weight:bold;
+    text-transform:uppercase;
+    margin-top:18px;
+    margin-bottom:8px;
+    padding-left:10px;
+    letter-spacing:1px;
+}
+
+/* Menu Links */
+
+.sidebar a{
+    display:block;
+    width:100%;
+    color:#e2e8f0;
+    text-decoration:none;
+    padding:10px 12px;
+    margin-bottom:3px;
+    border-radius:6px;
+    font-size:14px;
+    transition:0.2s;
+}
+
+.sidebar a:hover{
+    background:#334155;
+    color:white;
+}
+
+
+.sidebar a.menu-link,
+.sidebar .submenu a{
+    display:block;
+    color:#e2e8f0;
+    text-decoration:none;
+    padding:10px 12px;
+    border-radius:6px;
+    margin-bottom:4px;
+    font-size:14px;
+}
+
+.sidebar a.menu-link:hover,
+.sidebar .submenu a:hover{
+    background:#334155;
+    color:#fff;
+}
+
+.submenu{
+    padding-left:15px;
+    margin-bottom:8px;
+}
+
+.submenu a{
+    font-size:13px;
+    color:#cbd5e1;
+}
+.submenu a.active{
+    background:#2563eb;
+    color:#fff;
+    font-weight:600;
+}
+.main-content{
+    flex:1;
+    padding:25px;
+}
+
+
+
+.dashboard-link{
+    text-decoration:none;
+    color:inherit;
+}
+
+.erp-card{
+    min-height:150px;
+    border-radius:12px;
+    padding:22px;
+    color:#fff;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    box-shadow:0 6px 16px rgba(15,23,42,0.12);
+    transition:0.2s ease;
+}
+
+.erp-card:hover{
+    transform:translateY(-3px);
+}
+
+.erp-card h2{
+    font-size:32px;
+    font-weight:700;
+    margin-bottom:8px;
+}
+
+.erp-card p{
+    margin:0;
+    font-weight:600;
+}
+
+.erp-card i{
+    font-size:42px;
+    opacity:0.9;
+}
+
+.bg-blue{
+    background:linear-gradient(135deg,#2563eb,#0ea5e9);
+}
+
+.bg-green{
+    background:linear-gradient(135deg,#15803d,#22c55e);
+}
+
+.bg-cyan{
+    background:linear-gradient(135deg,#0891b2,#22d3ee);
+}
+
+.bg-orange{
+    background:linear-gradient(135deg,#f97316,#facc15);
+}
+
+.bg-gray{
+    background:linear-gradient(135deg,#64748b,#94a3b8);
+}
+
+.bg-darkblue{
+    background:linear-gradient(135deg,#0f172a,#334155);
+}
+
+.bg-red{
+    background:linear-gradient(135deg,#dc2626,#fb7185);
+}
+
+.dashboard-panel{
+    background:#fff;
+    border-radius:12px;
+    padding:20px;
+    box-shadow:0 6px 16px rgba(15,23,42,0.08);
+}
+
+.panel-title{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:15px;
+}
+
+.panel-title a{
+    font-size:14px;
+    text-decoration:none;
+}
+
+.activity-box{
+    border:1px solid #e5e7eb;
+    border-radius:10px;
+    padding:14px;
+    margin-bottom:12px;
+}
+
+.alert-card{
+    background:#fff;
+    border-radius:12px;
+    padding:18px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    box-shadow:0 6px 16px rgba(15,23,42,0.08);
+    min-height:110px;
+}
+
+.alert-card i{
+    font-size:34px;
+}
+
+.alert-card h6{
+    margin-bottom:8px;
+    font-weight:600;
+}
+
+
+
+/* .sidebar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+}
+
+.menu-link.active-parent {
+    background: #334155;
+    color: #fff;
+    font-weight: 600;
+}
+
+.menu-chevron {
+    transition: transform 0.2s ease;
+}
+
+.menu-link[aria-expanded="true"] .menu-chevron {
+    transform: rotate(180deg);
+}
+
+.submenu a i {
+    width: 18px;
+    display: inline-block;
+}
+
+.sidebar-user {
+    margin-top: auto !important;
+} */
+
+
+/* Layout and responsive improvements */
+
+
+.main-content {
+    min-width: 0;
+}
+
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.mobile-menu-button,
+.sidebar-overlay {
+    display: none;
+}
+
+@media (max-width: 991.98px) {
+    .wrapper {
+        display: block;
+    }
+
+    .sidebar {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 1050;
+        width: 260px;
+        height: 100vh;
+        overflow-y: auto;
+        transform: translateX(-100%);
+        transition: transform 0.25s ease;
+    }
+
+    .sidebar.mobile-open {
+        transform: translateX(0);
+    }
+
+    .sidebar-overlay {
+        display: block;
+        position: fixed;
+        inset: 0;
+        z-index: 1040;
+        background: rgba(15, 23, 42, 0.55);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.25s ease;
+    }
+
+    .sidebar-overlay.mobile-open {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .mobile-menu-button {
+        display: flex;
+        position: fixed;
+        top: 12px;
+        left: 12px;
+        z-index: 1030;
+        width: 42px;
+        height: 42px;
+        align-items: center;
+        justify-content: center;
+        border: 0;
+        border-radius: 8px;
+        background: #1e293b;
+        color: white;
+        font-size: 24px;
+    }
+
+    .main-content {
+        width: 100%;
+        padding: 65px 12px 12px;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .navbar .container-fluid {
+        align-items: flex-start !important;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .navbar .container-fluid > div:last-child {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+}

@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block page_title %}
+Edit Attendance
+{% endblock %}
+
+{% block page_subtitle %}
+Update attendance record
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <div class="card shadow-sm border-0">
+
+        <div class="card-header bg-white">
+            <h5 class="mb-0">Attendance Information</h5>
+        </div>
+
+        <div class="card-body">
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <div class="row">
+
+                    <div class="col-md-6 mb-3">
+                        <label>Employee</label>
+                        <input type="text"
+                               class="form-control"
+                               value="{{ attendance.employee }}"
+                               readonly>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label>Date</label>
+                        <input type="text"
+                               class="form-control"
+                               value="{{ attendance.attendance_date }}"
+                               readonly>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label>Status</label>
+
+                        <select name="status"
+                                class="form-control">
+
+                            <option value="PRESENT" {% if attendance.status == 'PRESENT' %}selected{% endif %}>Present</option>
+
+                            <option value="ABSENT" {% if attendance.status == 'ABSENT' %}selected{% endif %}>Absent</option>
+
+                            <option value="LEAVE" {% if attendance.status == 'LEAVE' %}selected{% endif %}>Leave</option>
+
+                            <option value="HOLIDAY" {% if attendance.status == 'HOLIDAY' %}selected{% endif %}>Holiday</option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label>Total Hours</label>
+
+                        <input type="number"
+                               step="0.5"
+                               name="total_hours"
+                               value="{{ attendance.total_hours }}"
+                               class="form-control">
+                    </div>
+
+                    <div class="col-md-12 mb-3">
+                        <label>Remarks</label>
+
+                        <textarea name="remarks"
+                                  rows="3"
+                                  class="form-control">{{ attendance.remarks }}</textarea>
+                    </div>
+
+                </div>
+
+                <button type="submit"
+                        class="btn btn-success">
+                    Save Changes
+                </button>
+
+                <a href="{% url 'attendance_list' %}"
+                   class="btn btn-secondary">
+                    Cancel
+                </a>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

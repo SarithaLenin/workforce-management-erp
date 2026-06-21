@@ -1,0 +1,328 @@
+{% extends "base.html" %}
+
+{% block page_title %}Process Salary Payments{% endblock %}
+
+{% block page_subtitle %}
+Select approved employees and record their payment
+{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'payroll_list' %}"
+   class="btn btn-outline-secondary btn-sm">
+    Back to Payroll
+</a>
+{% endblock %}
+
+{% block content %}
+
+<div class="border rounded bg-white mb-3">
+    <div class="p-3 border-bottom">
+        <h5 class="mb-0">Load Approved Payroll</h5>
+    </div>
+
+    <form method="get" class="p-3">
+        <div class="row g-3 align-items-end">
+
+            <div class="col-md-4">
+                <label class="form-label">Company</label>
+                {{ filter_form.company }}
+                {{ filter_form.company.errors }}
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label">Month</label>
+                {{ filter_form.month }}
+                {{ filter_form.month.errors }}
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label">Year</label>
+                {{ filter_form.year }}
+                {{ filter_form.year.errors }}
+            </div>
+
+            <div class="col-md-2">
+                <button class="btn btn-primary w-100">
+                    Load Employees
+                </button>
+            </div>
+
+        </div>
+    </form>
+</div>
+
+
+{% if company %}
+
+    {% if payrolls %}
+
+        <form method="post">
+            {% csrf_token %}
+
+           <input
+                type="hidden"
+                name="individual_payroll_id"
+                value="{{ preselected_payroll_id }}"
+>
+
+            <input type="hidden"
+                   name="company"
+                   value="{{ company.id }}">
+
+            <input type="hidden"
+                   name="month"
+                   value="{{ selected_month }}">
+
+            <input type="hidden"
+                   name="year"
+                   value="{{ selected_year }}">
+
+            <div class="border rounded bg-white mb-3">
+
+                <div class="p-3 border-bottom d-flex
+                            justify-content-between align-items-center">
+
+                    <div>
+                        <h5 class="mb-1">
+                            {{ company.name }}
+                        </h5>
+
+                        <div class="text-muted small">
+                            {{ payrolls.0.get_month_display }}
+                            {{ selected_year }}
+                        </div>
+                    </div>
+
+                    <div class="text-end">
+                        <div class="small text-muted">
+                            Selected Employees
+                        </div>
+
+                        <div class="fw-bold">
+                            <span id="selected-count">0</span>
+                            · AED
+                            <span id="selected-total">0.00</span>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 50px;">
+                                   <input
+                                        type="checkbox"
+                                        id="select-all"
+                                        {% if not preselected_payroll_id %}checked{% endif %} >
+                                </th>
+                                <th>Employee</th>
+                                <th>Salary Type</th>
+                                <th class="text-end">
+                                    Net Salary
+                                </th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for payroll in payrolls %}
+                                <tr>
+                                    <td>
+                                        <input
+                                            type="checkbox"
+                                            name="payroll_ids"
+                                            value="{{ payroll.id }}"
+                                            class="payroll-checkbox"
+                                            data-amount="{{ payroll.net_salary }}"
+                                            {% if preselected_payroll_id %}
+                                                {% if payroll.id|stringformat:"s" == preselected_payroll_id %}
+                                                    checked
+                                                {% endif %}
+                                            {% else %}
+                                                checked
+                                            {% endif %}
+                                        >
+                                    </td>
+
+                                    <td>
+                                        <strong>
+                                            {{ payroll.employee.employee_id }}
+                                        </strong>
+
+                                        <div>
+                                            {{ payroll.employee.first_name }}
+                                            {{ payroll.employee.last_name }}
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        {{ payroll.get_salary_type_display }}
+                                    </td>
+
+                                    <td class="text-end">
+                                        AED
+                                        {{ payroll.net_salary|floatformat:2 }}
+                                    </td>
+
+                                    <td>
+                                        <span class="badge bg-primary">
+                                            Approved
+                                        </span>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+
+                    </table>
+                </div>
+
+            </div>
+
+
+            <div class="border rounded bg-white">
+                <div class="p-3 border-bottom">
+                    <h5 class="mb-0">Payment Details</h5>
+                </div>
+
+                <div class="p-3">
+
+                    {% if payment_form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {{ payment_form.non_field_errors }}
+                        </div>
+                    {% endif %}
+
+                    <div class="row g-3">
+
+                        <div class="col-md-3">
+                            <label class="form-label">
+                                Payment Method
+                            </label>
+
+                            {{ payment_form.payment_method }}
+                            {{ payment_form.payment_method.errors }}
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label">
+                                Payment Date
+                            </label>
+
+                            {{ payment_form.payment_date }}
+                            {{ payment_form.payment_date.errors }}
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label">
+                                Reference
+                            </label>
+
+                            {{ payment_form.reference }}
+                            {{ payment_form.reference.errors }}
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label">
+                                Remarks
+                            </label>
+
+                            {{ payment_form.remarks }}
+                            {{ payment_form.remarks.errors }}
+                        </div>
+
+                    </div>
+
+                    <div class="mt-3">
+                        <button
+                            type="submit"
+                            class="btn btn-success"
+                            onclick="return confirm(
+                                'Mark selected employees as paid?'
+                            )"
+                        >
+                            Mark Selected as Paid
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
+        </form>
+
+    {% else %}
+
+        <div class="alert alert-info">
+            No approved, unpaid payroll records were found
+            for this company and period.
+        </div>
+
+    {% endif %}
+
+{% endif %}
+
+
+<script>
+    const selectAll = document.getElementById("select-all");
+    const checkboxes = document.querySelectorAll(
+        ".payroll-checkbox"
+    );
+    const countElement = document.getElementById(
+        "selected-count"
+    );
+    const totalElement = document.getElementById(
+        "selected-total"
+    );
+
+    function updateSelection() {
+        let count = 0;
+        let total = 0;
+
+        checkboxes.forEach(function (checkbox) {
+            if (checkbox.checked) {
+                count += 1;
+                total += parseFloat(
+                    checkbox.dataset.amount || "0"
+                );
+            }
+        });
+
+        if (countElement) {
+            countElement.textContent = count;
+        }
+
+        if (totalElement) {
+            totalElement.textContent = total.toFixed(2);
+        }
+
+        if (selectAll) {
+            selectAll.checked = (
+                checkboxes.length > 0
+                && count === checkboxes.length
+            );
+        }
+    }
+
+    if (selectAll) {
+        selectAll.addEventListener("change", function () {
+            checkboxes.forEach(function (checkbox) {
+                checkbox.checked = selectAll.checked;
+            });
+
+            updateSelection();
+        });
+    }
+
+    checkboxes.forEach(function (checkbox) {
+        checkbox.addEventListener(
+            "change",
+            updateSelection
+        );
+    });
+
+    updateSelection();
+</script>
+
+{% endblock %}

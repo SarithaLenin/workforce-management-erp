@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block page_title %}
+{{ title }}
+{% endblock %}
+
+{% block page_subtitle %}
+Create System User
+{% endblock %}
+
+{% block content %}
+
+<div class="card shadow-sm border-0">
+
+    <div class="card-header bg-white">
+        <h5 class="mb-0">Add User</h5>
+    </div>
+
+    <div class="card-body">
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="row">
+
+                <!-- Username -->
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Username</label>
+                    {{ form.username }}
+                </div>
+
+                <!-- Email -->
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Email</label>
+                    {{ form.email }}
+                </div>
+
+                <!-- First Name -->
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">First Name</label>
+                    {{ form.first_name }}
+                </div>
+
+                <!-- Last Name -->
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Last Name</label>
+                    {{ form.last_name }}
+                </div>
+
+                <!-- Password -->
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Password</label>
+                    {{ form.password }}
+                </div>
+
+                <!-- Role -->
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Role</label>
+                    {{ form.role }}
+                </div>
+
+                <!-- Active -->
+                <div class="col-md-6 mb-3">
+
+                    <label class="form-label d-block">
+                        Status
+                    </label>
+
+                    <div class="form-check form-switch">
+
+                        {{ form.is_active }}
+
+                        <label class="form-check-label">
+                            Active User
+                        </label>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <hr>
+
+            <button type="submit"
+                    class="btn btn-success">
+
+                <i class="bi bi-check-circle"></i>
+                Save User
+
+            </button>
+
+            <a href="{% url 'user_list' %}"
+               class="btn btn-secondary">
+
+                Cancel
+
+            </a>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

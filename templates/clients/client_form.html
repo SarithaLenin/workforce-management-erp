@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block page_title %}
+    {% if form.instance.pk %}
+        Edit Client
+    {% else %}
+        Add Client
+    {% endif %}
+{% endblock %}
+
+{% block page_subtitle %}
+Manage client company details
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <div class="card shadow-sm border-0 mb-4">
+
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Client Information</h5>
+            </div>
+
+            <div class="card-body">
+
+                <div class="row">
+
+                    <div class="col-md-4 mb-3">
+                        <label>Client Company Name</label>
+                        {{ form.name }}
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label>Contact Person</label>
+                        {{ form.contact_person }}
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label>Phone</label>
+                        {{ form.phone }}
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label>Email</label>
+                        {{ form.email }}
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label>TRN Number</label>
+                        {{ form.trn_number }}
+                    </div>
+
+                    <div class="col-md-12 mb-3">
+                        <label>Address</label>
+                        {{ form.address }}
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="card shadow-sm border-0 mb-4">
+
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Status</h5>
+            </div>
+
+            <div class="card-body">
+                <div class="form-check form-switch">
+                    {{ form.is_active }}
+                    <label class="form-check-label">Active Client</label>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="mb-4">
+            <button type="submit" class="btn btn-success">
+                <i class="bi bi-check-circle"></i> Save Client
+            </button>
+
+            <a href="{% url 'client_list' %}" class="btn btn-secondary">
+                Cancel
+            </a>
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

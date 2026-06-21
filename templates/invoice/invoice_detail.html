@@ -1,0 +1,303 @@
+{% extends "base.html" %}
+
+{% block page_title %}
+Invoice Detail
+{% endblock %}
+
+{% block page_subtitle %}
+Generated invoice details
+{% endblock %}
+
+{% block content %}
+
+<div class="card shadow-sm border-0 mb-3">
+
+    <div class="card-header bg-white
+                d-flex flex-column flex-lg-row
+                justify-content-between align-items-lg-center gap-3">
+
+        <div>
+            <h5 class="mb-1">{{ invoice.invoice_no }}</h5>
+
+            <small class="text-muted">
+                {{ invoice.timesheet.project_site.client.name }}
+                |
+                {{ invoice.timesheet.project_site.name }}
+
+                {% if invoice.status == "PAID" %}
+                    <span class="badge bg-success ms-2">
+                        PAID
+                    </span>
+                {% elif invoice.status == "APPROVED" %}
+                    <span class="badge bg-primary ms-2">
+                        APPROVED
+                    </span>
+                {% else %}
+                    <span class="badge bg-warning text-dark ms-2">
+                        DRAFT
+                    </span>
+                {% endif %}
+            </small>
+        </div>
+
+        <div class="d-flex flex-wrap gap-2">
+
+            <a href="{% url 'invoice_print' invoice.id %}"
+               class="btn btn-primary btn-sm"
+               target="_blank">
+                Print / Save PDF
+            </a>
+
+            <a href="{% url 'invoice_export_excel' invoice.id %}"
+               class="btn btn-success btn-sm">
+                Export Excel
+            </a>
+
+
+            {% if invoice.status == "DRAFT" %}
+
+                <form
+                    method="post"
+                    action="{% url 'invoice_approve' invoice.id %}"
+                    class="d-inline"
+                >
+                    {% csrf_token %}
+
+                    <button
+                        type="submit"
+                        class="btn btn-dark btn-sm"
+                        onclick="return confirm('Approve this invoice?')"
+                    >
+                        Approve
+                    </button>
+                </form>
+
+                <a href="{% url 'invoice_edit' invoice.id %}"
+                   class="btn btn-warning btn-sm">
+                    Edit
+                </a>
+
+                <a href="{% url 'invoice_delete' invoice.id %}"
+                   class="btn btn-danger btn-sm">
+                    Delete
+                </a>
+
+            {% elif invoice.status == "APPROVED" %}
+
+                <form
+                    method="post"
+                    action="{% url 'invoice_mark_paid' invoice.id %}"
+                    class="d-inline"
+                >
+                    {% csrf_token %}
+
+                    <button
+                        type="submit"
+                        class="btn btn-success btn-sm"
+                        onclick="return confirm('Mark this invoice as paid?')"
+                    >
+                        Mark Paid
+                    </button>
+                </form>
+
+                {% if request.user.userprofile.role == "admin" %}
+
+                    <form
+                        method="post"
+                        action="{% url 'invoice_reopen' invoice.id %}"
+                        class="d-inline"
+                    >
+                        {% csrf_token %}
+
+                        <button
+                            type="submit"
+                            class="btn btn-warning btn-sm"
+                            onclick="return confirm('Reopen this invoice?')"
+                        >
+                            Reopen
+                        </button>
+                    </form>
+
+                    <a href="{% url 'invoice_delete' invoice.id %}"
+                       class="btn btn-danger btn-sm">
+                        Delete
+                    </a>
+
+                {% endif %}
+
+            {% endif %}
+
+
+            <a href="{% url 'invoice_list' %}"
+               class="btn btn-secondary btn-sm">
+                Back
+            </a>
+
+        </div>
+    </div>
+</div>
+
+
+<div class="card shadow-sm border-0 mb-3">
+    <div class="card-body">
+
+        <div class="row g-3">
+
+            <div class="col-sm-6 col-lg-3">
+                <strong>Company</strong><br>
+                {{ invoice.company.name }}
+            </div>
+
+            <div class="col-sm-6 col-lg-3">
+                <strong>Client</strong><br>
+                {{ invoice.timesheet.project_site.client.name }}
+            </div>
+
+            <div class="col-sm-6 col-lg-3">
+                <strong>Project / Site</strong><br>
+                {{ invoice.timesheet.project_site.name }}
+            </div>
+
+            <div class="col-sm-6 col-lg-3">
+                <strong>Invoice Date</strong><br>
+                {{ invoice.invoice_date|date:"d-m-Y" }}
+            </div>
+
+            <div class="col-sm-6 col-lg-3">
+                <strong>LPO Number</strong><br>
+                {{ invoice.lpo_no|default:"-" }}
+            </div>
+
+            <div class="col-sm-6 col-lg-3">
+                <strong>Payment Terms</strong><br>
+                {{ invoice.payment_terms|default:"-" }}
+            </div>
+
+            <div class="col-sm-6 col-lg-3">
+                <strong>Period</strong><br>
+                {{ invoice.timesheet.get_month_display }}
+                {{ invoice.timesheet.year }}
+            </div>
+
+            <div class="col-sm-6 col-lg-3">
+                <strong>Status</strong><br>
+                {{ invoice.get_status_display }}
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+<div class="card shadow-sm border-0 mb-3">
+
+    <div class="card-header bg-white">
+        <h5 class="mb-0">Invoice Items</h5>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-bordered align-middle mb-0">
+
+            <thead class="table-dark">
+                <tr>
+                    <th>Designation</th>
+                    <th>Qty</th>
+                    <th>Total Hours</th>
+                    <th>Unit Price</th>
+                    <th>Taxable Amount</th>
+                    <th>VAT</th>
+                    <th>Net Amount</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for item in items %}
+                    <tr>
+                        <td>{{ item.designation.name }}</td>
+                        <td>{{ item.qty }}</td>
+                        <td>{{ item.total_hours|floatformat:2 }}</td>
+                        <td>{{ item.unit_price|floatformat:2 }}</td>
+                        <td>{{ item.taxable_amount|floatformat:2 }}</td>
+                        <td>{{ item.vat_amount|floatformat:2 }}</td>
+                        <td>{{ item.net_amount|floatformat:2 }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="7"
+                            class="text-center text-muted py-4">
+                            No invoice items found.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+
+            <tfoot>
+                <tr class="table-secondary fw-bold">
+                    <td colspan="4" class="text-end">
+                        Totals
+                    </td>
+                    <td>{{ taxable_total|floatformat:2 }}</td>
+                    <td>{{ vat_total|floatformat:2 }}</td>
+                    <td>{{ net_total|floatformat:2 }}</td>
+                </tr>
+            </tfoot>
+
+        </table>
+    </div>
+</div>
+
+
+<div class="card shadow-sm border-0">
+    <div class="card-body">
+
+        <div class="mb-3">
+            <strong>Description</strong>
+
+            <div class="border rounded p-2 mt-1 bg-light">
+                {{ invoice.description|default:"-" }}
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <strong>Terms & Conditions</strong>
+
+            <div
+                class="border rounded p-2 mt-1 bg-light"
+                style="white-space: pre-line;"
+            >
+                {{ invoice.terms_conditions|default:"-" }}
+            </div>
+        </div>
+
+        <div class="row g-3">
+
+            <div class="col-md-4">
+                <strong>Checked By</strong><br>
+                {{ invoice.checked_by|default:"-" }}<br>
+
+                <small class="text-muted">
+                    {{ invoice.checked_by_designation|default:"" }}
+                </small>
+            </div>
+
+            <div class="col-md-4">
+                <strong>Approved By</strong><br>
+                {{ invoice.approved_by|default:"-" }}<br>
+
+                <small class="text-muted">
+                    {{ invoice.approved_by_designation|default:"" }}
+                </small>
+            </div>
+
+            <div class="col-md-4">
+                <strong>Remarks</strong><br>
+                {{ invoice.remarks|default:"-" }}
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

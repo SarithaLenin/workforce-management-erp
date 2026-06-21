@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block page_title %}
+Settings
+{% endblock %}
+
+{% block page_subtitle %}
+System information and preferences
+{% endblock %}
+
+{% block content %}
+
+<div class="card shadow-sm border-0">
+    <div class="card-body">
+
+        <h5 class="mb-3">System Settings</h5>
+
+        <table class="table table-bordered">
+            <tr>
+                <th>System Name</th>
+                <td>Workforce Management System</td>
+            </tr>
+
+            <tr>
+                <th>Group Name</th>
+                <td>HAYAAT GROUP</td>
+            </tr>
+
+            <tr>
+                <th>Current User</th>
+                <td>{{ request.user.username }}</td>
+            </tr>
+
+            <tr>
+                <th>User Role</th>
+                <td>{{ request.user.userprofile.get_role_display }}</td>
+            </tr>
+
+            <tr>
+                <th>Version</th>
+                <td>1.0</td>
+            </tr>
+        </table>
+
+    </div>
+</div>
+
+{% endblock %}

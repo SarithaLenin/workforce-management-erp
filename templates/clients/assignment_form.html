@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block page_title %}
+    {% if form.instance.pk %}
+        Edit Assignment
+    {% else %}
+        Add Assignment
+    {% endif %}
+{% endblock %}
+
+{% block page_subtitle %}
+Assign employee to project/site
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <div class="card shadow-sm border-0 mb-4">
+
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Assignment Information</h5>
+            </div>
+
+            <div class="card-body">
+
+                <div class="row">
+
+                    <div class="col-md-6 mb-3">
+                        <label>Employee</label>
+                        {{ form.employee }}
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label>Designation</label>
+                        {{ form.designation }}
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label>Project / Site</label>
+                        {{ form.project_site }}
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label>Start Date</label>
+                        {{ form.start_date }}
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label>End Date</label>
+                        {{ form.end_date }}
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label>Status</label>
+                        {{ form.status }}
+                    </div>
+
+                    <div class="col-md-12 mb-3">
+                        <label>Remarks</label>
+                        {{ form.remarks }}
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="mb-4">
+            <button type="submit" class="btn btn-success">
+                <i class="bi bi-check-circle"></i> Save Assignment
+            </button>
+
+            <a href="{% url 'assignment_list' %}" class="btn btn-secondary">
+                Cancel
+            </a>
+        </div>
+
+    </form>
+
+</div>
+
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        $('#id_employee').select2({
+            placeholder: "Search employee by name or ID",
+            width: '100%'
+        });
+
+        $('#id_project_site').select2({
+            placeholder: "Search project/site",
+            width: '100%'
+        });
+    });
+</script>
+
+{% endblock %}

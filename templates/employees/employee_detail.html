@@ -1,0 +1,359 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block page_title %}
+Employee Profile
+{% endblock %}
+
+{% block page_subtitle %}
+View employee information and documents
+{% endblock %}
+{% block page_actions %}
+
+<div class="btn-group shadow-sm">
+
+    <a href="{% url 'employee_update' employee.id %}"
+       class="btn btn-outline-dark">
+
+        <i class="bi bi-pencil"></i>
+        Edit
+
+    </a>
+
+    <a href="{% url 'employee_delete' employee.id %}"
+       class="btn btn-outline-danger">
+
+        <i class="bi bi-trash"></i>
+        Delete
+
+    </a>
+
+</div>
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <div class="mb-3">
+        <a href="{% url 'employee_list' %}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Employee List
+        </a>
+        
+    </div>
+
+    <!-- Employee Profile Card -->
+    <div class="card shadow-sm border-0 mb-4">
+
+        <div class="card-body">
+
+            <div class="row align-items-center">
+
+                <div class="col-md-2 text-center">
+
+                    {% if employee.photo %}
+                        <img src="{{ employee.photo.url }}"
+                             class="rounded-circle img-thumbnail"
+                             width="120"
+                             height="120"
+                             style="object-fit: cover;">
+                    {% else %}
+                        <div class="rounded-circle bg-secondary text-white d-flex justify-content-center align-items-center mx-auto"
+                             style="width:120px;height:120px;font-size:40px;">
+                            {{ employee.first_name|first }}
+                        </div>
+                    {% endif %}
+
+                </div>
+
+                <div class="col-md-10">
+
+                    <h3 class="mb-1">
+                        {{ employee.first_name }} {{ employee.last_name }}
+                    </h3>
+
+                    <p class="text-muted mb-2">
+                        {{ employee.employee_id }}
+                    </p>
+
+                    <span class="badge bg-primary">
+                        {{ employee.company.name }}
+                    </span>
+
+                    <span class="badge bg-info">
+                        {{ employee.designation.name }}
+                    </span>
+
+                    {% if employee.is_active %}
+                        <span class="badge bg-success">
+                            Active
+                        </span>
+                    {% else %}
+                        <span class="badge bg-danger">
+                            Inactive
+                        </span>
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Basic Information -->
+    <div class="card shadow-sm border-0 mb-4">
+
+        <div class="card-header bg-white">
+            <h5 class="mb-0">Basic Information</h5>
+        </div>
+
+        <div class="card-body">
+
+            <div class="row">
+
+                <div class="col-md-4 mb-3">
+                    <strong>Nationality</strong><br>
+                    {{ employee.nationality|default:"-" }}
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <strong>Gender</strong><br>
+                    {{ employee.gender|default:"-" }}
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <strong>Date of Birth</strong><br>
+                    {{ employee.date_of_birth|default:"-" }}
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <strong>Mobile</strong><br>
+                    {{ employee.mobile|default:"-" }}
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <strong>Email</strong><br>
+                    {{ employee.email|default:"-" }}
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <strong>Joining Date</strong><br>
+                    {{ employee.joining_date }}
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Salary Information -->
+    <div class="card shadow-sm border-0 mb-4">
+
+        <div class="card-header bg-white">
+            <h5 class="mb-0">Salary Information</h5>
+        </div>
+
+        <div class="card-body">
+
+            <div class="row">
+
+                <div class="col-md-3">
+                    <strong>Salary Type</strong><br>
+                    {{ employee.salary_type }}
+                </div>
+
+                <div class="col-md-3">
+                    <strong>Basic Salary</strong><br>
+                    {{ employee.basic_salary|default:"-" }}
+                </div>
+
+                <div class="col-md-3">
+                    <strong>Food Allowance</strong><br>
+                    {{ employee.food_allowance|default:"-" }}
+                </div>
+
+                <div class="col-md-3">
+                    <strong>Daily Rate</strong><br>
+                    {{ employee.daily_rate|default:"-" }}
+                </div>
+
+                <div class="col-md-3 mt-3">
+                    <strong>Hourly Rate</strong><br>
+                    {{ employee.hourly_rate|default:"-" }}
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Documents -->
+    <div class="card shadow-sm border-0">
+
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+
+    <h5 class="mb-0">Documents</h5>
+
+    <a href="{% url 'employee_document_create' employee.id %}"
+       class="btn btn-primary btn-sm">
+
+        <i class="bi bi-plus-circle"></i>
+        Add Document
+
+    </a>
+
+</div>
+
+        <div class="card-body">
+
+            {% for doc in documents %}
+
+                <div class="border rounded p-3 mb-4">
+
+                   <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+
+                            <h5 class="text-primary mb-0">
+                                {{ doc.get_document_type_display }}
+                            </h5>
+
+                            <span class="badge {{ doc.expiry_badge_class }}">
+                                {{ doc.expiry_status }}
+                            </span>
+
+                        </div>
+                           <a href="{% url 'employee_document_file_add' doc.id %}"
+                            class="btn btn-sm btn-light border">
+                                <i class="bi bi-plus-circle"></i> Add File
+                            </a>
+
+                            <a href="{% url 'employee_document_update' doc.id %}"
+                            class="btn btn-sm btn-light border">
+
+                                <i class="bi bi-pencil"></i>
+                                Edit
+
+                            </a>
+
+                            <a href="{% url 'employee_document_delete' doc.id %}"
+                            class="btn btn-sm btn-light border text-danger">
+
+                                <i class="bi bi-trash"></i>
+                                Delete
+
+                            </a>
+
+                    </div>
+
+                    <div class="row">
+
+                        <div class="col-md-4">
+                            <strong>Document Number</strong><br>
+                            {{ doc.document_number|default:"-" }}
+                        </div>
+
+                        <div class="col-md-4">
+                            <strong>Issue Date</strong><br>
+                            {{ doc.issue_date|default:"-" }}
+                        </div>
+
+                        <div class="col-md-4">
+                            <strong>Expiry Date</strong><br>
+                            {{ doc.expiry_date|default:"-" }}
+                        </div>
+
+                    </div>
+
+                    <hr>
+
+                    <div class="row">
+
+                        {% for file in doc.files.all %}
+
+                            <div class="col-md-3 mb-3">
+
+                                <div class="card h-100">
+
+                                    <div class="card-body text-center">
+
+                                        <i class="bi bi-file-earmark-image fs-1 text-primary"></i>
+
+                                        <p class="mt-2 mb-2">
+                                            {{ file.file_title|default:"Document File" }}
+                                        </p>
+
+                                       <div class="d-flex gap-2 justify-content-center">
+
+                                            <a href="{{ file.file.url }}"
+                                            target="_blank"
+                                            class="btn btn-sm btn-outline-primary">
+                                                View
+                                            </a>
+
+                                            <a href="{{ file.file.url }}"
+                                            download
+                                            class="btn btn-sm btn-outline-success">
+                                                Download
+                                            </a>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        {% empty %}
+
+                            <p class="text-muted">
+                                No files uploaded.
+                            </p>
+
+                        {% endfor %}
+
+                    </div>
+
+                </div>
+
+            {% empty %}
+
+                <p class="text-muted">
+                    No documents available.
+                </p>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+
+    <!-- Employee Actions
+    <div class="card shadow-sm border-0 mt-4 mb-4">
+
+        <div class="card-header bg-white">
+            <h5 class="mb-0">Employee Actions</h5>
+        </div>
+
+        <div class="card-body">
+
+            <a href="{% url 'employee_update' employee.id %}" class="btn btn-warning">
+                <i class="bi bi-pencil"></i> Edit Employee
+            </a>
+
+            <a href="{% url 'employee_delete' employee.id %}" class="btn btn-danger">
+                <i class="bi bi-trash"></i> Delete Employee
+            </a>
+
+        </div>
+
+    </div> -->
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block page_title %}
+Generate Invoice
+{% endblock %}
+
+{% block page_subtitle %}
+Enter invoice details
+{% endblock %}
+
+{% block content %}
+
+<div class="card shadow-sm border-0">
+    <div class="card-body">
+
+        <h5 class="mb-3">
+            {{ timesheet.project_site.name }} -
+            {{ timesheet.get_month_display }}-{{ timesheet.year }}
+        </h5>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            {{ form.as_p }}
+
+            <button type="submit" class="btn btn-success">
+                Generate Invoice
+            </button>
+
+            <a href="{% url 'timesheet_detail' timesheet.id %}" class="btn btn-secondary">
+                Cancel
+            </a>
+        </form>
+
+    </div>
+</div>
+
+{% endblock %}

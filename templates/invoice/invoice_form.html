@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block page_title %}
+Edit Invoice
+{% endblock %}
+
+{% block page_subtitle %}
+Update draft invoice details
+{% endblock %}
+
+{% block content %}
+
+<div class="card shadow-sm border-0">
+    <div class="card-body">
+
+        <form method="POST">
+            {% csrf_token %}
+
+            {{ form.as_p }}
+
+            <button type="submit" class="btn btn-success">
+                Save Changes
+            </button>
+
+            <a href="{% url 'invoice_detail' invoice.id %}" class="btn btn-secondary">
+                Cancel
+            </a>
+        </form>
+
+    </div>
+</div>
+
+{% endblock %}

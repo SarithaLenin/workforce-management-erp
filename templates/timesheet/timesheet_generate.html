@@ -1,0 +1,239 @@
+{% extends 'base.html' %}
+{%  load custom_filters %}
+
+{% block page_title %}
+Monthly Timesheet
+{% endblock %}
+
+{% block page_subtitle %}
+Generate project-wise monthly manpower timesheet
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-white">
+            <h5 class="mb-0">Generate Timesheet</h5>
+        </div>
+
+        <div class="card-body">
+            <form method="GET">
+                <div class="row g-3">
+
+                    <div class="col-md-3">
+                        <label>Our Company</label>
+                        <select name="company" class="form-control" required>
+                            <option value="">Select Company</option>
+                            {% for company in companies %}
+                                <option value="{{ company.id }}"
+                                    {% if selected_company and selected_company.id == company.id %}
+                                        selected
+                                    {% endif %}>
+                                    {{ company.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label>Project / Site</label>
+                        <select name="project" class="form-control" required>
+                            <option value="">Select Project</option>
+                            {% for project in projects %}
+                                <option value="{{ project.id }}"
+                                    {% if selected_project and selected_project.id == project.id %}
+                                        selected
+                                    {% endif %}>
+                                    {{ project.client.name }} - {{ project.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="col-md-2">
+                        <label>Month</label>
+                        <select name="month" class="form-control" required>
+                            <option value="">Month</option>
+                            {% for m in "123456789101112"|make_list %}
+                            {% endfor %}
+                            <option value="1" {% if selected_month == 1 %}selected{% endif %}>January</option>
+                            <option value="2" {% if selected_month == 2 %}selected{% endif %}>February</option>
+                            <option value="3" {% if selected_month == 3 %}selected{% endif %}>March</option>
+                            <option value="4" {% if selected_month == 4 %}selected{% endif %}>April</option>
+                            <option value="5" {% if selected_month == 5 %}selected{% endif %}>May</option>
+                            <option value="6" {% if selected_month == 6 %}selected{% endif %}>June</option>
+                            <option value="7" {% if selected_month == 7 %}selected{% endif %}>July</option>
+                            <option value="8" {% if selected_month == 8 %}selected{% endif %}>August</option>
+                            <option value="9" {% if selected_month == 9 %}selected{% endif %}>September</option>
+                            <option value="10" {% if selected_month == 10 %}selected{% endif %}>October</option>
+                            <option value="11" {% if selected_month == 11 %}selected{% endif %}>November</option>
+                            <option value="12" {% if selected_month == 12 %}selected{% endif %}>December</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-2">
+                        <label>Year</label>
+                        <input type="number"
+                               name="year"
+                               class="form-control"
+                               value="{{ selected_year|default:'' }}"
+                               placeholder="2026"
+                               required>
+                    </div>
+
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-dark w-100">
+                            Generate
+                        </button>
+                    </div>
+
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    {% if existing_timesheet %}
+    <div class="alert alert-warning mt-3">
+        <strong>Timesheet already saved.</strong><br>
+        A timesheet already exists for this project and month.
+
+        <div class="mt-2">
+            <a href="{% url 'timesheet_detail' existing_timesheet.id %}"
+            class="btn btn-sm btn-dark">
+                Open Existing Timesheet
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if timesheet_rows %}
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+
+           <div class="text-center mb-3">
+
+                <h5 class="mb-1">
+                    DETAILS OF MANPOWER HIRED FROM
+                </h5>
+
+                <h4 class="fw-bold">
+                    {{ selected_company.name }}
+                </h4>
+
+                <p class="mb-1">
+                    <strong>Project Name :</strong>
+                    {{ selected_project.name }}
+                </p>
+
+                {% if selected_project.project_code %}
+                <p class="mb-1">
+                    <strong>Project Number :</strong>
+                    {{ selected_project.project_code }}
+                </p>
+                {% endif %}
+
+                <p class="mb-1 fw-bold">
+                    {{ month_name|upper }}-{{ selected_year }}
+                    ({{ start_date|date:"d-m-Y" }} to {{ end_date|date:"d-m-Y" }})
+                </p>
+
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-bordered table-sm text-center align-middle">
+
+                    <thead class="table-dark">
+                        <tr>
+                            <th>S.No</th>
+                            <th>Name</th>
+                            <th>Designation</th>
+
+                            {% for day in days %}
+                                <th>{{ day }}</th>
+                            {% endfor %}
+
+                            <th>Total Hours</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for row in timesheet_rows %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+
+                            <td class="text-start">
+                                {{ row.employee.first_name }}
+                                {{ row.employee.last_name }}
+                            </td>
+
+                            <td>{{ row.designation.name|default:"-" }}</td>
+
+                            {% for value in row.days %}
+                                <td>{{ value }}</td>
+                            {% endfor %}
+
+                            <td>
+                                <strong>{{ row.total_hours }}</strong>
+                            </td>
+                        </tr>
+                        {% endfor %}
+
+                        <tr class="fw-bold table-secondary">
+                            <td colspan="3">Daily Total Hours</td>
+
+                            {% for day in days %}
+                                <td>
+                                    {{ daily_totals|get_item:day|default:"0" }}
+                                </td>
+                            {% endfor %}
+
+                            <td> 
+                            
+                                    <strong>{{ grand_total_hours }}</strong>
+                            
+                            </td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    {% endif %}
+
+
+
+    {% if timesheet_rows %}
+
+        <div class="mt-4 mb-4">
+
+            <a href="{% url 'timesheet_generate' %}?company={{ selected_company.id }}&project={{ selected_project.id }}&month={{ selected_month }}&year={{ selected_year }}&save=1"
+            class="btn btn-success">
+
+                <i class="bi bi-save"></i>
+                Save Timesheet
+
+            </a>
+
+            <a href="{% url 'timesheet_generate' %}"
+            class="btn btn-secondary ms-2">
+
+                Cancel
+
+            </a>
+
+        </div>
+
+        {% endif %}
+
+</div>
+
+{% endblock %}

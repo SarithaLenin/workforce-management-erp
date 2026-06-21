@@ -1,0 +1,221 @@
+{% extends 'base.html' %}
+
+{% block page_title %}
+Invoice List
+{% endblock %}
+
+{% block page_subtitle %}
+Manage client invoices
+{% endblock %}
+
+{% block content %}
+
+<div class="card shadow-sm border-0 mb-3">
+    <div class="card-body">
+
+        <form method="GET" class="row g-2">
+
+            <div class="col-md-4">
+                <input type="text"
+                    name="search"
+                    class="form-control"
+                    placeholder="Search client, project or invoice no...">
+                
+            </div>
+
+            <div class="col-md-2">
+                <select name="month" class="form-control">
+
+                    <option value="">All Months</option>
+
+                    <option value="1">January</option>
+                    <option value="2">February</option>
+                    <option value="3">March</option>
+                    <option value="4">April</option>
+                    <option value="5">May</option>
+                    <option value="6">June</option>
+                    <option value="7">July</option>
+                    <option value="8">August</option>
+                    <option value="9">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
+
+                </select>
+            </div>
+
+
+            <div class="col-md-2">
+                <input type="number"
+                    name="year"
+                    class="form-control"
+                    placeholder="Year"
+                    value="{{ year }}">
+            </div>
+
+            <div class="col-md-3">
+                <select name="status" class="form-control">
+                    <option value="">All Status</option>
+                    <option value="DRAFT" {% if status == 'DRAFT' %}selected{% endif %}>Draft</option>
+                    <option value="APPROVED" {% if status == 'APPROVED' %}selected{% endif %}>Approved</option>
+                    <option value="PAID" {% if status == 'PAID' %}selected{% endif %}>Paid</option>
+                </select>
+            </div>
+
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-dark w-100">
+                    Search
+                </button>
+            </div>
+
+            <div class="col-md-2">
+                <a href="{% url 'invoice_list' %}" class="btn btn-secondary w-100">
+                    Reset
+                </a>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+
+
+<div class="row mb-3">
+
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center">
+                <h6>Total Invoices</h6>
+                <h3>{{ total_invoices }}</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center">
+                <h6>Draft</h6>
+                <h3 class="text-warning">
+                    {{ draft_count }}
+                </h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center">
+                <h6>Approved</h6>
+                <h3 class="text-primary">
+                    {{ approved_count }}
+                </h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center">
+                <h6>Paid</h6>
+                <h3 class="text-success">
+                    {{ paid_count }}
+                </h3>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-header bg-white">
+        <h5 class="mb-0">Invoices</h5>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+
+            <thead class="table-dark">
+                <tr>
+                    <th>Invoice No</th>
+                    <th>Date</th>
+                    <th>Company</th>
+                    <th>Client</th>
+                    <th>Project</th>
+                    <th>Period</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for invoice in invoices %}
+                <tr style="cursor:pointer;"onclick="window.location.href='{% url 'invoice_detail' invoice.id %}'">
+
+                    <td>{{ invoice.invoice_no }}</td>
+                    <td>{{ invoice.invoice_date|date:"d-m-Y" }}</td>
+                    <td>{{ invoice.company.name }}</td>
+                    <td>{{ invoice.timesheet.project_site.client.name }}</td>
+                    <td>{{ invoice.timesheet.project_site.name }}</td>
+                    <td>
+                        {{ invoice.timesheet.get_month_display }}-{{ invoice.timesheet.year }}
+                    </td>
+
+                    <td>
+                        {% if invoice.status == 'DRAFT' %}
+                            <span class="badge bg-warning text-dark">DRAFT</span>
+                        {% elif invoice.status == 'APPROVED' %}
+                            <span class="badge bg-primary">APPROVED</span>
+                        {% elif invoice.status == 'PAID' %}
+                            <span class="badge bg-success">PAID</span>
+                        {% endif %}
+                    </td>
+
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center text-muted py-4">
+                        No invoices found.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+    </div>
+</div>
+
+
+
+{% if page_obj.has_other_pages %}
+<nav class="mt-3">
+    <ul class="pagination justify-content-center">
+
+        {% if page_obj.has_previous %}
+        <li class="page-item">
+            <a class="page-link"
+               href="?page={{ page_obj.previous_page_number }}&search={{ search }}&status={{ status }}&month={{ month }}&year={{ year }}">
+                Previous
+            </a>
+        </li>
+        {% endif %}
+
+        <li class="page-item active">
+            <span class="page-link">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+            </span>
+        </li>
+
+        {% if page_obj.has_next %}
+        <li class="page-item">
+            <a class="page-link"
+               href="?page={{ page_obj.next_page_number }}&search={{ search }}&status={{ status }}&month={{ month }}&year={{ year }}">
+                Next
+            </a>
+        </li>
+        {% endif %}
+
+    </ul>
+</nav>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+
+{% block page_title %}
+Payroll List
+{% endblock %}
+
+{% block page_subtitle %}
+Monthly employee salary records
+{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'generate_payroll' %}" class="btn btn-primary btn-sm">
+    Generate Payroll
+</a>
+{% endblock %}
+
+{% block content %}
+
+<div class="card shadow-sm border-0">
+
+    <div class="card-header bg-white">
+        <h5 class="mb-0">Payroll Records</h5>
+    </div>
+
+    <div class="card shadow-sm border-0 mb-3">
+        <div class="card-body">
+
+            <form method="GET" class="row g-2">
+
+                <div class="col-md-3">
+                    <input type="text"
+                        name="search"
+                        class="form-control"
+                        placeholder="Search employee..."
+                        value="{{ search }}">
+                </div>
+
+                <div class="col-md-2">
+                    <select name="month" class="form-select">
+                        <option value="">All Months</option>
+                        <option value="1" {% if month == '1' %}selected{% endif %}>January</option>
+                        <option value="2" {% if month == '2' %}selected{% endif %}>February</option>
+                        <option value="3" {% if month == '3' %}selected{% endif %}>March</option>
+                        <option value="4" {% if month == '4' %}selected{% endif %}>April</option>
+                        <option value="5" {% if month == '5' %}selected{% endif %}>May</option>
+                        <option value="6" {% if month == '6' %}selected{% endif %}>June</option>
+                        <option value="7" {% if month == '7' %}selected{% endif %}>July</option>
+                        <option value="8" {% if month == '8' %}selected{% endif %}>August</option>
+                        <option value="9" {% if month == '9' %}selected{% endif %}>September</option>
+                        <option value="10" {% if month == '10' %}selected{% endif %}>October</option>
+                        <option value="11" {% if month == '11' %}selected{% endif %}>November</option>
+                        <option value="12" {% if month == '12' %}selected{% endif %}>December</option>
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <input type="number"
+                        name="year"
+                        class="form-control"
+                        placeholder="Year"
+                        value="{{ year }}">
+                </div>
+
+                <div class="col-md-3">
+                    <select name="company" class="form-select">
+                        <option value="">All Companies</option>
+                        {% for company in companies %}
+                            <option value="{{ company.id }}"
+                                {% if company_id == company.id|stringformat:"s" %}selected{% endif %}>
+                                {{ company.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <button class="btn btn-dark w-100">
+                        Search
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+
+
+    <div class="border rounded bg-white mb-3">
+        <div class="row g-0 text-center">
+
+            <div class="col-6 col-lg-3 p-3 border-end">
+                <div class="text-muted small">Employees</div>
+                <div class="fs-4 fw-bold">
+                    {{ total_employees }}
+                </div>
+            </div>
+
+            <div class="col-6 col-lg-3 p-3 border-end">
+                <div class="text-muted small">Net Payroll</div>
+                <div class="fs-4 fw-bold text-success text-nowrap">
+                    AED {{ total_payroll|floatformat:2 }}
+                </div>
+            </div>
+
+            <div class="col-6 col-lg-3 p-3 border-end">
+                <div class="text-muted small">Basic Salary</div>
+                <div class="fs-4 fw-bold">
+                    {{ basic_count }}
+                </div>
+            </div>
+
+            <div class="col-6 col-lg-3 p-3">
+                <div class="text-muted small">Hourly Salary</div>
+                <div class="fs-4 fw-bold">
+                    {{ hourly_count }}
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+
+            <thead class="table-dark">
+                <tr>
+                    <th>Employee ID</th>
+                    <th>Employee Name</th>
+                    <th>Company</th>
+                    <th>Month</th>
+                    <th>Year</th>
+                    <th>Salary Type</th>
+                    <th>Gross Salary</th>
+                    <th>Net Salary</th>
+                    <th>Status</th>
+
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for payroll in payrolls %}
+                <tr style="cursor: pointer;"onclick="window.location.href='{% url 'payroll_detail' payroll.id %}'" >
+                    <td>{{ payroll.employee.employee_id }}</td>
+                    <td>{{ payroll.employee.first_name }} {{ payroll.employee.last_name }}</td>
+                    <td>{{ payroll.company.name }}</td>
+                    <td>{{ payroll.get_month_display }}</td>
+                    <td>{{ payroll.year }}</td>
+                    <td>{{ payroll.salary_type }}</td>
+                    <td>AED {{ payroll.gross_salary|floatformat:2 }}</td>
+                    <td>AED {{ payroll.net_salary|floatformat:2 }}</td>
+                    <td>
+                        {% if payroll.status == "PAID" %}
+                            <span class="badge bg-success">Paid</span>
+                        {% elif payroll.status == "APPROVED" %}
+                            <span class="badge bg-primary">Approved</span>
+                        {% else %}
+                            <span class="badge bg-warning text-dark">Draft</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" class="text-center text-muted py-4">
+                        No payroll records found.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block page_title %}
+Delete Client
+{% endblock %}
+
+{% block page_subtitle %}
+Confirm client deletion
+{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+
+    <div class="col-md-6">
+
+        <div class="card shadow-sm border-0">
+
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">Confirm Delete</h5>
+            </div>
+
+            <div class="card-body">
+
+                <p>Are you sure you want to delete this client company?</p>
+
+                <h5>{{ client.name }}</h5>
+
+                <form method="POST" class="mt-4">
+                    {% csrf_token %}
+
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash"></i> Yes, Delete
+                    </button>
+
+                    <a href="{% url 'client_detail' client.id %}" class="btn btn-secondary">
+                        Cancel
+                    </a>
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

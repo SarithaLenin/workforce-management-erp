@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block page_title %}
+<h5 class="mb-0">Delete Company</h5>
+{% endblock %}
+
+{% block content %}
+
+<div class="card shadow">
+
+    <div class="card-body">
+
+        <h4>
+            Delete Company
+        </h4>
+
+        <p>
+
+            Are you sure you want to delete
+
+            <strong>
+                {{ company.name }}
+            </strong>?
+
+        </p>
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            <button class="btn btn-danger">
+
+                Yes Delete
+
+            </button>
+
+            <a href="{% url 'company_list' %}"
+               class="btn btn-secondary">
+
+                Cancel
+
+            </a>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

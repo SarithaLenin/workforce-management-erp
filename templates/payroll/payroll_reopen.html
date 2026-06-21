@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block page_title %}Reopen Payroll{% endblock %}
+
+{% block page_subtitle %}
+{{ payroll.employee.first_name }}
+{{ payroll.employee.last_name }}
+— {{ payroll.get_month_display }} {{ payroll.year }}
+{% endblock %}
+
+{% block content %}
+
+<div class="border rounded bg-white">
+    <div class="p-3 border-bottom">
+        <h5 class="mb-1">Reopen Approved Payroll</h5>
+        <div class="text-danger small">
+            Reopening will unlock salary and deduction changes.
+        </div>
+    </div>
+
+    <form method="post" class="p-3">
+        {% csrf_token %}
+
+        <div class="mb-3">
+            <label class="form-label">
+                {{ form.reason.label }}
+            </label>
+
+            {{ form.reason }}
+            {{ form.reason.errors }}
+        </div>
+
+        <button type="submit" class="btn btn-warning">
+            Reopen Payroll
+        </button>
+
+        <a href="{% url 'payroll_detail' payroll.pk %}"
+           class="btn btn-outline-secondary">
+            Cancel
+        </a>
+    </form>
+</div>
+
+{% endblock %}

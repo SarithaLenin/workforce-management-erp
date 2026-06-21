@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    {% if form.instance.pk %}Edit Employee{% else %}Add Employee{% endif %}
+{% endblock %}
+
+{% block page_title %}
+    {% if form.instance.pk %}Edit Employee{% else %}Add Employee{% endif %}
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Basic Information</h5>
+            </div>
+
+            <div class="card-body">
+                <div class="row">
+
+                    <div class="col-md-3 mb-3">
+                        <label>Employee ID</label>
+                        {{ form.employee_id }}
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label>First Name</label>
+                        {{ form.first_name }}
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label>Last Name</label>
+                        {{ form.last_name }}
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label>Photo</label>
+                        {{ form.photo }}
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label>Mobile</label>
+                        {{ form.mobile }}
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label>Email</label>
+                        {{ form.email }}
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label>Nationality</label>
+                        {{ form.nationality }}
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label>Gender</label>
+                        {{ form.gender }}
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label>Date of Birth</label>
+                        {{ form.date_of_birth }}
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label>Joining Date</label>
+                        {{ form.joining_date }}
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Company & Job Information</h5>
+            </div>
+
+            <div class="card-body">
+                <div class="row">
+
+                    <div class="col-md-6 mb-3">
+                        <label>Company</label>
+                        {{ form.company }}
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label>Designation</label>
+                        {{ form.designation }}
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Salary Information</h5>
+            </div>
+
+            <div class="card-body">
+                <div class="row">
+
+                    <div class="col-md-3 mb-3">
+                        <label>Salary Type</label>
+                        {{ form.salary_type }}
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label>Basic Salary</label>
+                        {{ form.basic_salary }}
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label>Food Allowance</label>
+                        {{ form.food_allowance }}
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label>Daily Rate</label>
+                        {{ form.daily_rate }}
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label>Hourly Rate</label>
+                        {{ form.hourly_rate }}
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Status</h5>
+            </div>
+
+            <div class="card-body">
+                <div class="form-check form-switch">
+                    {{ form.is_active }}
+                    <label class="form-check-label">Active Employee</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-4">
+            <button type="submit" class="btn btn-success">
+                <i class="bi bi-check-circle"></i> Save Employee
+            </button>
+
+            <a href="{% url 'employee_list' %}" class="btn btn-secondary">
+                Cancel
+            </a>
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

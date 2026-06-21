@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block page_title %}
+Bulk Edit Attendance
+{% endblock %}
+
+{% block page_subtitle %}
+Update or delete multiple attendance records at once
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <div class="card shadow-sm border-0">
+
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="mb-0">Attendance Records</h5>
+                    <small class="text-muted">Date: {{ attendance_date }}</small>
+                </div>
+            </div>
+
+            <div class="card-body p-0">
+
+                <div class="table-responsive">
+
+                    <table class="table table-hover align-middle mb-0">
+
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Employee</th>
+                                <th>Designation</th>
+                                <th>Status</th>
+                                <th>Hours</th>
+                                <th>Remarks</th>
+                                <th class="text-center">Delete</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            {% for attendance in attendances %}
+                            <tr>
+                                <td>
+                                    <strong>{{ attendance.employee.employee_id }}</strong><br>
+                                    <small>
+                                        {{ attendance.employee.first_name }}
+                                        {{ attendance.employee.last_name }}
+                                    </small>
+                                </td>
+
+                                <td>
+                                    {{ attendance.assignment.designation.name|default:"-" }}
+                                </td>
+
+                                <td>
+                                    <select name="status_{{ attendance.id }}" class="form-control">
+                                        <option value="PRESENT" {% if attendance.status == 'PRESENT' %}selected{% endif %}>Present</option>
+                                        <option value="ABSENT" {% if attendance.status == 'ABSENT' %}selected{% endif %}>Absent</option>
+                                        <option value="LEAVE" {% if attendance.status == 'LEAVE' %}selected{% endif %}>Leave</option>
+                                        <option value="HOLIDAY" {% if attendance.status == 'HOLIDAY' %}selected{% endif %}>Holiday</option>
+                                    </select>
+                                </td>
+
+                                <td>
+                                    <input type="number"
+                                           step="0.5"
+                                           name="hours_{{ attendance.id }}"
+                                           value="{{ attendance.total_hours }}"
+                                           class="form-control">
+                                </td>
+
+                                <td>
+                                    <input type="text"
+                                           name="remarks_{{ attendance.id }}"
+                                           value="{{ attendance.remarks }}"
+                                           class="form-control">
+                                </td>
+
+                                <td class="text-center">
+                                    <input type="checkbox"
+                                           name="delete_{{ attendance.id }}"
+                                           class="form-check-input">
+                                </td>
+                            </tr>
+
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-5">
+                                    No attendance records found.
+                                </td>
+                            </tr>
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="mt-4 mb-4">
+            <button type="submit" class="btn btn-success">
+                <i class="bi bi-check-circle"></i> Save Changes
+            </button>
+
+            <a href="{% url 'attendance_list' %}" class="btn btn-secondary">
+                Cancel
+            </a>
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

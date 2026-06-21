@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+
+{% block page_title %}
+Timesheet List
+{% endblock %}
+
+{% block page_subtitle %}
+Saved monthly timesheets
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+            <form method="GET">
+                <div class="row g-2">
+
+                    <div class="col-md-4">
+                        <input type="text"
+                               name="search"
+                               class="form-control"
+                               placeholder="Search company, client, project..."
+                               value="{{ search }}">
+                    </div>
+
+                    <div class="col-md-2">
+                        <select name="month" class="form-control">
+                            <option value="">All Months</option>
+                            <option value="1" {% if month == "1" %}selected{% endif %}>JAN</option>
+                            <option value="2" {% if month == "2" %}selected{% endif %}>FEB</option>
+                            <option value="3" {% if month == "3" %}selected{% endif %}>MAR</option>
+                            <option value="4" {% if month == "4" %}selected{% endif %}>APR</option>
+                            <option value="5" {% if month == "5" %}selected{% endif %}>MAY</option>
+                            <option value="6" {% if month == "6" %}selected{% endif %}>JUN</option>
+                            <option value="7" {% if month == "7" %}selected{% endif %}>JUL</option>
+                            <option value="8" {% if month == "8" %}selected{% endif %}>AUG</option>
+                            <option value="9" {% if month == "9" %}selected{% endif %}>SEP</option>
+                            <option value="10" {% if month == "10" %}selected{% endif %}>OCT</option>
+                            <option value="11" {% if month == "11" %}selected{% endif %}>NOV</option>
+                            <option value="12" {% if month == "12" %}selected{% endif %}>DEC</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-2">
+                        <input type="number"
+                               name="year"
+                               class="form-control"
+                               placeholder="Year"
+                               value="{{ year }}">
+                    </div>
+
+                    <div class="col-md-2">
+                        <select name="status" class="form-control">
+                            <option value="">All Status</option>
+                            <option value="DRAFT" {% if status == "DRAFT" %}selected{% endif %}>Draft</option>
+                            <option value="APPROVED" {% if status == "APPROVED" %}selected{% endif %}>Approved</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-dark w-100">
+                            Search
+                        </button>
+                    </div>
+
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0">
+
+        <div class="card-header bg-white d-flex justify-content-between">
+            <h5 class="mb-0">Timesheets</h5>
+            <span class="badge bg-primary">Total: {{ timesheets.count }}</span>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover mb-0 align-middle">
+
+                <thead class="table-dark">
+                    <tr>
+                        <th>Company</th>
+                        <th>Client</th>
+                        <th>Project / Site</th>
+                        <th>Period</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for timesheet in timesheets %}
+                    <tr style="cursor:pointer;"onclick="window.location.href='{% url 'timesheet_detail' timesheet.id %}'">
+                        <td>{{ timesheet.company.name }}</td>
+                        <td>{{ timesheet.project_site.client.name }}</td>
+                        <td>{{ timesheet.project_site.name }}</td>
+                        <td>{{ timesheet.get_month_display }}-{{ timesheet.year }}</td>
+                        <td>
+                            {% if timesheet.status == 'APPROVED' %}
+                                <span class="badge bg-success">APPROVED</span>
+                            {% else %}
+                                <span class="badge bg-primary">DRAFT</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ timesheet.created_at|date:"d-m-Y" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center py-4 text-muted">
+                            No timesheets found.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

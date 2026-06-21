@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block page_title %}
+Companies
+{% endblock %}
+
+{% block content %}
+
+<div class="card shadow">
+
+    <div class="card-body">
+
+        <div class="d-flex justify-content-between mb-3">
+
+            <h5>Company List</h5>
+
+            <a href="{% url 'company_create' %}" class="btn btn-primary">
+                Add Company
+            </a>
+
+        </div>
+
+        <form method="GET" class="mb-3">
+
+            <input type="text"
+                   name="search"
+                   class="form-control"
+                   placeholder="Search company..."
+                   value="{{ search }}">
+
+        </form>
+
+        <table class="table table-hover">
+
+            <thead>
+                <tr>
+                    <th>Logo</th>
+                    <th>Code</th>
+                    <th>Name</th>
+                    <th>Phone</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for company in page_obj %}
+
+                <tr>
+
+                    <td>
+                        {% if company.logo %}
+                            <img src="{{ company.logo.url }}" width="40">
+                        {% endif %}
+                    </td>
+
+                    <td>{{ company.code }}</td>
+                    <td>{{ company.name }}</td>
+                    <td>{{ company.phone }}</td>
+
+                    <td>
+                        {% if company.is_active %}
+                            <span class="badge bg-success">Active</span>
+                        {% else %}
+                            <span class="badge bg-danger">Inactive</span>
+                        {% endif %}
+                    </td>
+
+                    <td>
+
+                        <a href="{% url 'company_update' company.id %}" class="btn btn-sm btn-warning">
+                            Edit
+                        </a>
+
+                        <a href="{% url 'company_delete' company.id %}" class="btn btn-sm btn-danger">
+                            Delete
+                        </a>
+
+                    </td>
+
+                </tr>
+
+                {% empty %}
+                <tr>
+                    <td colspan="6">No companies found</td>
+                </tr>
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}

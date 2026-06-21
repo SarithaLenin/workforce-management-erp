@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>
+        Salary Slip -
+        {{ payroll.employee.employee_id }}
+    </title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            color: #222;
+            margin: 30px;
+        }
+
+        .slip {
+            max-width: 850px;
+            margin: auto;
+            border: 1px solid #bbb;
+            padding: 30px;
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #222;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .header h1,
+        .header h2 {
+            margin: 5px;
+        }
+
+        .details {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .details td {
+            padding: 5px;
+        }
+
+        .salary-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .salary-table th,
+        .salary-table td {
+            border: 1px solid #bbb;
+            padding: 10px;
+        }
+
+        .amount {
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        .net-row {
+            background: #222;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .signatures {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 70px;
+        }
+
+        .signature {
+            width: 30%;
+            text-align: center;
+            border-top: 1px solid #222;
+            padding-top: 8px;
+        }
+
+        .actions {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        @media print {
+            .actions {
+                display: none;
+            }
+
+            body {
+                margin: 0;
+            }
+
+            .slip {
+                border: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="actions">
+    <button onclick="window.print()">
+        Print / Save as PDF
+    </button>
+
+    <button onclick="window.close()">
+        Close
+    </button>
+</div>
+
+<div class="slip">
+
+    <div class="header">
+        <h1>{{ payroll.company.name }}</h1>
+        <h2>Salary Slip</h2>
+
+        <div>
+            {{ payroll.get_month_display }}
+            {{ payroll.year }}
+        </div>
+    </div>
+
+    <table class="details">
+        <tr>
+            <td><strong>Employee ID:</strong></td>
+            <td>{{ payroll.employee.employee_id }}</td>
+
+            <td><strong>Salary Type:</strong></td>
+            <td>{{ payroll.get_salary_type_display }}</td>
+        </tr>
+
+        <tr>
+            <td><strong>Employee Name:</strong></td>
+            <td>
+                {{ payroll.employee.first_name }}
+                {{ payroll.employee.last_name }}
+            </td>
+
+            <td><strong>Status:</strong></td>
+            <td>{{ payroll.get_status_display }}</td>
+        </tr>
+
+        <tr>
+            <td><strong>Designation:</strong></td>
+            <td>
+                {{ payroll.employee.designation|default:"—" }}
+            </td>
+
+            <td><strong>Period:</strong></td>
+            <td>
+                {{ payroll.get_month_display }}
+                {{ payroll.year }}
+            </td>
+        </tr>
+    </table>
+
+
+    <table class="salary-table">
+        <thead>
+            <tr>
+                <th>Description</th>
+                <th class="amount">Earnings</th>
+                <th class="amount">Deductions</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            {% if payroll.salary_type == "BASIC" %}
+                <tr>
+                    <td>Basic Salary</td>
+                    <td class="amount">
+                        AED {{ payroll.basic_salary|floatformat:2 }}
+                    </td>
+                    <td></td>
+                </tr>
+
+                <tr>
+                    <td>Food Allowance</td>
+                    <td class="amount">
+                        AED {{ payroll.food_allowance|floatformat:2 }}
+                    </td>
+                    <td></td>
+                </tr>
+
+                <tr>
+                    <td>
+                        Overtime
+                        ({{ payroll.overtime_hours|floatformat:2 }}
+                        hours)
+                    </td>
+                    <td class="amount">
+                        AED {{ payroll.overtime_amount|floatformat:2 }}
+                    </td>
+                    <td></td>
+                </tr>
+
+                <tr>
+                    <td>
+                        Absence
+                        ({{ payroll.absent_days }} days)
+                    </td>
+                    <td></td>
+                    <td class="amount">
+                        AED {{ payroll.absence_deduction|floatformat:2 }}
+                    </td>
+                </tr>
+
+            {% else %}
+                <tr>
+                    <td>
+                        Salary
+                        ({{ payroll.total_hours|floatformat:2 }}
+                        hours × AED
+                        {{ payroll.hourly_rate|floatformat:2 }})
+                    </td>
+                    <td class="amount">
+                        AED {{ payroll.gross_salary|floatformat:2 }}
+                    </td>
+                    <td></td>
+                </tr>
+            {% endif %}
+
+            {% for deduction in payroll.deductions.all %}
+                <tr>
+                    <td>
+                        {{ deduction.get_deduction_type_display }}
+                        {% if deduction.remarks %}
+                            — {{ deduction.remarks }}
+                        {% endif %}
+                    </td>
+                    <td></td>
+                    <td class="amount">
+                        AED {{ deduction.amount|floatformat:2 }}
+                    </td>
+                </tr>
+            {% endfor %}
+
+            <tr>
+                <th>Totals</th>
+                <th class="amount">
+                    AED {{ payroll.gross_salary|floatformat:2 }}
+                </th>
+                <th class="amount">
+                    AED {{ payroll.total_deductions|floatformat:2 }}
+                </th>
+            </tr>
+
+            <tr class="net-row">
+                <td colspan="2">Net Salary</td>
+                <td class="amount">
+                    AED {{ payroll.net_salary|floatformat:2 }}
+                </td>
+            </tr>
+
+        </tbody>
+    </table>
+
+
+    <div class="signatures">
+        <div class="signature">
+            Prepared By
+        </div>
+
+        <div class="signature">
+            Employee Signature
+        </div>
+
+        <div class="signature">
+            Authorized Signature
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

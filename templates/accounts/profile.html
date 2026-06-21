@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block page_title %}
+My Profile
+{% endblock %}
+
+{% block page_subtitle %}
+Logged in user details
+{% endblock %}
+
+{% block content %}
+
+<div class="card shadow-sm border-0">
+    <div class="card-body">
+
+        <h5 class="mb-3">Profile Details</h5>
+
+        <table class="table table-bordered">
+            <tr>
+                <th>Username</th>
+                <td>{{ request.user.username }}</td>
+            </tr>
+
+            <tr>
+                <th>Full Name</th>
+                <td>{{ request.user.first_name }} {{ request.user.last_name }}</td>
+            </tr>
+
+            <tr>
+                <th>Email</th>
+                <td>{{ request.user.email }}</td>
+            </tr>
+
+            <tr>
+                <th>Role</th>
+                <td>{{ request.user.userprofile.get_role_display }}</td>
+            </tr>
+
+            <tr>
+                <th>Last Login</th>
+                <td>{{ request.user.last_login|date:"d-m-Y H:i" }}</td>
+            </tr>
+        </table>
+
+        <a href="{% url 'edit_profile' %}" class="btn btn-warning">
+            Edit Profile
+        </a>
+
+        <a href="{% url 'change_password' %}" class="btn btn-dark">
+            Change Password
+        </a>
+
+    </div>
+</div>
+
+{% endblock %}

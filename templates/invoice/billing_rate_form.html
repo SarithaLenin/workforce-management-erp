@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block page_title %}
+Add Billing Rate
+{% endblock %}
+
+{% block page_subtitle %}
+Add client rate for project and designation
+{% endblock %}
+
+{% block content %}
+
+<div class="card shadow-sm border-0">
+    <div class="card-body">
+
+        <form method="POST">
+            {% csrf_token %}
+
+            {{ form.as_p }}
+
+            <button type="submit" class="btn btn-success">
+                Save
+            </button>
+
+            <a href="{% url 'billing_rate_list' %}" class="btn btn-secondary">
+                Cancel
+            </a>
+
+        </form>
+
+    </div>
+</div>
+
+{% endblock %}

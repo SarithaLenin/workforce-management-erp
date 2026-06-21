@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block page_title %}Edit Deduction{% endblock %}
+
+{% block page_subtitle %}
+{{ payroll.employee.first_name }}
+{{ payroll.employee.last_name }}
+— {{ payroll.get_month_display }} {{ payroll.year }}
+{% endblock %}
+
+{% block content %}
+
+<div class="border rounded bg-white">
+    <div class="p-3 border-bottom">
+        <h5 class="mb-0">Update Deduction</h5>
+    </div>
+
+    <form method="post" class="p-3">
+        {% csrf_token %}
+
+        <div class="mb-3">
+            <label class="form-label">Deduction Type</label>
+            {{ form.deduction_type }}
+            {{ form.deduction_type.errors }}
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Amount</label>
+            {{ form.amount }}
+            {{ form.amount.errors }}
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Remarks</label>
+            {{ form.remarks }}
+            {{ form.remarks.errors }}
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+            Save Changes
+        </button>
+
+        <a href="{% url 'payroll_detail' payroll.pk %}"
+           class="btn btn-outline-secondary">
+            Cancel
+        </a>
+    </form>
+</div>
+
+{% endblock %}

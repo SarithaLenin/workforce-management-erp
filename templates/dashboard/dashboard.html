@@ -1,0 +1,267 @@
+{% extends 'base.html' %}
+
+{% block page_title %}
+Welcome {{ request.user.username }} 👋
+{% endblock %}
+
+{% block page_subtitle %}
+Here’s what’s happening in your ERP system.
+{% endblock %}
+
+{% block content %}
+
+<div class="row g-4 mb-4">
+
+    <div class="col-md-3">
+        <a href="{% url 'employee_list' %}" class="dashboard-link">
+            <div class="erp-card bg-blue">
+                <div>
+                    <h2>{{ total_employees }}</h2>
+                    <p>Total Employees</p>
+                </div>
+                <i class="bi bi-people-fill"></i>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-3">
+        <a href="{% url 'company_list' %}" class="dashboard-link">
+            <div class="erp-card bg-green">
+                <div>
+                    <h2>{{ total_companies }}</h2>
+                    <p>Total Companies</p>
+                </div>
+                <i class="bi bi-building"></i>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-3">
+        <a href="{% url 'client_list' %}" class="dashboard-link">
+            <div class="erp-card bg-cyan">
+                <div>
+                    <h2>{{ total_clients }}</h2>
+                    <p>Total Clients</p>
+                </div>
+                <i class="bi bi-person-badge"></i>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-3">
+        <a href="{% url 'project_site_list' %}" class="dashboard-link">
+            <div class="erp-card bg-orange">
+                <div>
+                    <h2>{{ total_projects }}</h2>
+                    <p>Projects / Sites</p>
+                </div>
+                <i class="bi bi-geo-alt-fill"></i>
+            </div>
+        </a>
+    </div>
+
+</div>
+
+<div class="row g-4 mb-4">
+
+    <div class="col-md-3">
+        <a href="{% url 'invoice_list' %}" class="dashboard-link">
+            <div class="erp-card bg-gray">
+                <div>
+                    <h2>{{ draft_invoices }}</h2>
+                    <p>Draft Invoices</p>
+                </div>
+                <i class="bi bi-file-earmark-text"></i>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-3">
+        <a href="{% url 'invoice_list' %}" class="dashboard-link">
+            <div class="erp-card bg-darkblue">
+                <div>
+                    <h2>{{ paid_invoices }}</h2>
+                    <p>Paid Invoices</p>
+                </div>
+                <i class="bi bi-receipt"></i>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-3">
+        <a href="{% url 'outstanding_invoice_report' %}" class="dashboard-link">
+            <div class="erp-card bg-red">
+                <div>
+                    <h2>AED {{ outstanding_amount }}</h2>
+                    <p>Outstanding Amount</p>
+                </div>
+                <i class="bi bi-exclamation-circle"></i>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-3">
+        <a href="{% url 'payment_collection_report' %}" class="dashboard-link">
+            <div class="erp-card bg-green">
+                <div>
+                    <h2>AED {{ collected_amount }}</h2>
+                    <p>Collected Amount</p>
+                </div>
+                <i class="bi bi-cash-stack"></i>
+            </div>
+        </a>
+    </div>
+
+</div>
+
+<div class="row g-4 mb-4">
+
+    <div class="col-md-6">
+        <div class="dashboard-panel">
+            <div class="panel-title">
+                <h5>Recent Timesheets</h5>
+                <a href="{% url 'timesheet_list' %}">View all →</a>
+            </div>
+
+            {% for ts in recent_timesheets %}
+                <div class="activity-box">
+                    <strong>{{ ts.project_site.name }}</strong>
+                    <span class="badge bg-primary">{{ ts.status }}</span>
+                    <p class="mb-0">
+                        {{ ts.get_month_display }}-{{ ts.year }}
+                    </p>
+                </div>
+            {% empty %}
+                <p class="text-muted">No recent timesheets.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="dashboard-panel">
+            <div class="panel-title">
+                <h5>Recent Invoices</h5>
+                <a href="{% url 'invoice_list' %}">View all →</a>
+            </div>
+
+            {% for invoice in recent_invoices %}
+                <div class="activity-box">
+                    <strong>{{ invoice.invoice_no }}</strong>
+
+                    {% if invoice.status == 'PAID' %}
+                        <span class="badge bg-success">PAID</span>
+                    {% elif invoice.status == 'APPROVED' %}
+                        <span class="badge bg-warning text-dark">APPROVED</span>
+                    {% else %}
+                        <span class="badge bg-secondary">DRAFT</span>
+                    {% endif %}
+
+                    <p class="mb-0">
+                        {{ invoice.timesheet.project_site.client.name }}
+                    </p>
+                </div>
+            {% empty %}
+                <p class="text-muted">No recent invoices.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+</div>
+
+<div class="row g-4 mb-4">
+
+    <div class="col-md-3">
+        <a href="{% url 'document_alert_list' 'PASSPORT' %}" class="dashboard-link">
+            <div class="alert-card">
+                <i class="bi bi-passport text-warning"></i>
+                <div>
+                    <h6>Passport Expiring</h6>
+                    <span class="badge bg-warning text-dark">
+                        {{ passport_expiring|default:0 }}
+                    </span>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-3">
+        <a href="{% url 'document_alert_list' 'VISA' %}" class="dashboard-link">
+            <div class="alert-card">
+                <i class="bi bi-file-earmark-text text-danger"></i>
+                <div>
+                    <h6>Visa Expiring</h6>
+                    <span class="badge bg-danger">
+                        {{ visa_expiring|default:0 }}
+                    </span>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-3">
+        <a href="{% url 'document_alert_list' 'EMIRATES_ID' %}" class="dashboard-link">
+            <div class="alert-card">
+                <i class="bi bi-person-vcard text-info"></i>
+                <div>
+                    <h6>Emirates ID Expiring</h6>
+                    <span class="badge bg-info">
+                        {{ eid_expiring|default:0 }}
+                    </span>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-3">
+        <a href="{% url 'document_alert_list' 'LABOUR_CARD' %}" class="dashboard-link">
+            <div class="alert-card">
+                <i class="bi bi-card-text text-secondary"></i>
+                <div>
+                    <h6>Labour Card Expiring</h6>
+                    <span class="badge bg-secondary">
+                        {{ labour_card_expiring|default:0 }}
+                    </span>
+                </div>
+            </div>
+        </a>
+    </div>
+
+</div>
+
+<div class="dashboard-panel mb-4">
+    <h5 class="mb-3">Quick Actions</h5>
+
+    <div class="row g-3">
+
+        <div class="col-md-3">
+            <a href="{% url 'employee_create' %}" class="btn btn-primary w-100 py-3">
+                <i class="bi bi-person-plus"></i> Add Employee
+            </a>
+        </div>
+
+        <div class="col-md-3">
+            <a href="{% url 'client_create' %}" class="btn btn-success w-100 py-3">
+                <i class="bi bi-person-plus-fill"></i> Add Client
+            </a>
+        </div>
+
+        <div class="col-md-3">
+            <a href="{% url 'timesheet_generate' %}" class="btn btn-info w-100 py-3 text-white">
+                <i class="bi bi-calendar-plus"></i> Add Timesheet
+            </a>
+        </div>
+
+        <div class="col-md-3">
+            <a href="{% url 'timesheet_list' %}" class="btn btn-warning w-100 py-3 text-white">
+                <i class="bi bi-receipt"></i> Generate Invoice
+            </a>
+        </div>
+
+    </div>
+</div>
+
+
+{% endblock %}
+
+
+
