@@ -2,6 +2,29 @@
 
 A Django-based enterprise resource planning system for manpower operations. It includes company and client management, employee records, project assignments, attendance, timesheets, invoicing, payroll, user accounts, and dashboard reporting.
 
+## Features
+
+- User Authentication
+- Role-Based Access Control
+- Company Management
+- Client Management
+- Employee Management
+- Project/Site Management
+- Timesheet Management
+- Invoice Management
+- Payroll Processing
+- Dashboard Reporting
+- PDF Reports
+
+## Technology Stack
+
+- Python 3.13
+- Django 6.0.5
+- SQLite3
+- Bootstrap 5
+- HTML
+- CSS
+- JavaScript
 ## Requirements
 
 - Python 3.12 or newer
