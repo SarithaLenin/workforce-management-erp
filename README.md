@@ -75,10 +75,10 @@ Open `http://127.0.0.1:8000/` in a browser.
 
 - Application login: `http://127.0.0.1:8000/accounts/login/`
 - Django administration: `http://127.0.0.1:8000/admin/`
-- Username: `admin`
-- Password: `Admin@12345`
+Demo Credentials
 
-These are demonstration credentials created during setup. Change the password before using the application outside a local assessment environment.
+Please create a superuser using:
+python manage.py createsuperuser
 
 ## Commands summary
 
